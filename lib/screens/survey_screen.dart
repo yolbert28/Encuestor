@@ -1,10 +1,10 @@
 import 'package:encuestor/components/primary_button.dart';
 import 'package:encuestor/components/survey_question.dart';
 import 'package:encuestor/core/app_color.dart';
-import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
 import 'package:encuestor/domain/survey.dart';
 import 'package:encuestor/domain/survey_option.dart';
+import 'package:encuestor/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class SurveyScreen extends StatefulWidget {
@@ -157,12 +157,15 @@ class _SurveyScreenState extends State<SurveyScreen> {
   final ScrollController _scrollController = ScrollController();
 
   @override
-  Widget build(BuildContext context) {
-
+  void initState() {
+    super.initState();
     for (var s in survey) {
       response[s.id] = 0;
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     final int startIndex = _currentPage * _pageSize;
     final int endIndex = (startIndex + _pageSize > survey.length)
         ? survey.length
@@ -221,7 +224,34 @@ class _SurveyScreenState extends State<SurveyScreen> {
                   );
                 } else {
                   // Lógica para finalizar la encuesta
-                  print(response.toString());
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false, // El usuario debe presionar el botón
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        insetPadding: EdgeInsets.all(20),
+                        actionsPadding: EdgeInsets.only(bottom: 20, top: 8),
+                        backgroundColor: AppColor.primary,
+                        title: Text("Sus respuestas fueron enviadas con exito", textAlign: TextAlign.center, style: TextStyles.titleLight),
+                        content: Text("¡Gracias por completar la encuesta!", style: TextStyles.body),
+                        actions: <Widget>[
+                          PrimaryButton(
+                            text: "Aceptar",
+                            onPressed: () {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                                (Route<dynamic> route) => false,
+                              );
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 }
               },
             ),

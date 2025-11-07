@@ -21,43 +21,45 @@ class _HomeScreenState extends State<HomeScreen> {
         automaticallyImplyLeading: false,
       ),
       backgroundColor: AppColor.background,
-      body: SingleChildScrollView(
-        child: Column(
-          spacing: 16,
-          children: [
-            SizedBox(height: 8),
-            Text("Encuestas disponibles", style: TextStyles.title),
-            SurveyCard(
-              title: "Sistemas Operativos",
-              profesor: "Juan Perez",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SurveyScreen()),
-                );
-              },
-            ),
-            SurveyCard(
-              title: "Bases de Datos",
-              profesor: "Maria Rodriguez",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SurveyScreen()),
-                );
-              },
-            ),
-            SurveyCard(
-              title: "Redes de Computadoras",
-              profesor: "Carlos Gomez",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SurveyScreen()),
-                );
+      body: Padding(
+        padding: const EdgeInsets.only(top: 24, bottom: 16),
+        child: SingleChildScrollView(
+          child: Column(
+            spacing: 16,
+            children: [
+              Text("Encuestas disponibles", style: TextStyles.title),
+              SurveyCard(
+                title: "Sistemas Operativos",
+                info: "Juan Perez",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SurveyScreen()),
+                  );
                 },
-            ),
-          ],
+              ),
+              SurveyCard(
+                title: "Bases de Datos",
+                info: "Maria Rodriguez",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SurveyScreen()),
+                  );
+                },
+              ),
+              SurveyCard(
+                title: "Redes de Computadoras",
+                info: "Carlos Gomez",
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SurveyScreen()),
+                  );
+                  },
+              ),
+            ],
+          ),
         ),
       ),
     );

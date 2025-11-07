@@ -11,6 +11,27 @@ class TextStyles {
   );
 
 
+  static final TextStyle titleProfesor = TextStyle(
+    fontSize: 28,
+    fontWeight: FontWeight.bold,
+    fontFamily: GoogleFonts.bricolageGrotesque().fontFamily,
+    color: AppColor.textDarkProfesor,
+  );
+
+  static final TextStyle subtitleProfesor = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    fontFamily: GoogleFonts.bricolageGrotesque().fontFamily,
+    color: AppColor.textDarkProfesor,
+  );
+
+  static final TextStyle titleLight = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    fontFamily: GoogleFonts.bricolageGrotesque().fontFamily,
+    color: AppColor.white,
+  );
+
   static final TextStyle subtitle = TextStyle(
     fontSize: 20,
     fontWeight: FontWeight.bold,
@@ -20,6 +41,9 @@ class TextStyles {
 
   static final TextStyle body = TextStyle(fontSize: 16,
     fontFamily: GoogleFonts.bricolageGrotesque().fontFamily, color: AppColor.white);
+
+  static final TextStyle bodyProfesor = TextStyle(fontSize: 16,
+    fontFamily: GoogleFonts.bricolageGrotesque().fontFamily, color: AppColor.textDarkProfesor);
 
   static final TextStyle buttonText = TextStyle(
     fontSize: 18,

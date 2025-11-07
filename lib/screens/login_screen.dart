@@ -2,6 +2,7 @@ import 'package:encuestor/components/animated_switch.dart';
 import 'package:encuestor/components/app_text_field.dart';
 import 'package:encuestor/components/primary_button.dart';
 import 'package:encuestor/core/app_color.dart';
+import 'package:encuestor/screens/home_profesor_screen.dart';
 import 'package:encuestor/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -55,10 +56,17 @@ class _LoginScreenState extends State<LoginScreen> {
             PrimaryButton(
               text: "Ingresar",
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                );
+                if (isProfesor) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeProfesorScreen()),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeScreen()),
+                  );
+                }
               },
             ),
           ],

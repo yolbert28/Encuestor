@@ -8,14 +8,17 @@ class AppColor {
   static const backgroundP = Color(0xFFC1D5D3);
 
   static const accent = Color(0xFFff851b);
+  static const secondaryButtonBackground = Color.fromARGB(95, 255, 133, 27);
 
   static const hint = Color(0xFF707070);
   static const lightGrey = Color(0xFF7E8492);
 
-
-  static const textFieldDisabled = Color.fromARGB(208, 70, 70, 70);
+  static const textFieldDisabled = Color(0xD0464646);
 
   static const textDark = Color(0xFF004DB3);
+  static const textDarkProfesor = Color(0xFF00423B);
+
+  static const surveyEditCardBackground = Color(0x85016458);
 
   static const white = Color(0xFFFFFFFF);
   static const green = Color(0xFF4CAF50);
