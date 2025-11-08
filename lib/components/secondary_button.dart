@@ -6,10 +6,12 @@ class SecondaryButton extends StatefulWidget {
   final double height;
   final double width;
   final double horizontalPadding;
+  final Color backgroundColor;
+  final Color borderColor;
   final String text;
   final Function() onPressed;
 
-  const SecondaryButton({super.key, this.height = 60, this.width = double.infinity, this.horizontalPadding = 20, required this.text, required this.onPressed});
+  const SecondaryButton({super.key, this.height = 60, this.width = double.infinity, this.horizontalPadding = 20, required this.text, required this.onPressed, this.backgroundColor = AppColor.secondaryButtonBackground, this.borderColor = AppColor.accent});
 
   @override
   State<SecondaryButton> createState() => _SecondaryButtonState();
@@ -27,9 +29,9 @@ class _SecondaryButtonState extends State<SecondaryButton> {
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
-              side: BorderSide(width: 2, color: AppColor.accent)
+              side: BorderSide(width: 2, color: widget.borderColor)
             ),
-            backgroundColor: AppColor.secondaryButtonBackground,
+            backgroundColor: widget.backgroundColor,
             foregroundColor: AppColor.white,
           ),
           onPressed: widget.onPressed,

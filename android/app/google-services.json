@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "374403579665",
+    "project_id": "encuestor",
+    "storage_bucket": "encuestor.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:374403579665:android:bc21e7326b7324281516b0",
+        "android_client_info": {
+          "package_name": "com.example.encuestor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAC295Dhv2Krz0eflTBT7yGtmjKKmNsKaI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

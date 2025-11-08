@@ -22,11 +22,9 @@ class SurveyCard extends StatefulWidget {
 
 class _SurveyCardState extends State<SurveyCard> {
   final colors = [
-  Color(0xFFA88522), // Amarillo Dorado Oscuro
-  Color(0xFF4DB065), // Verde Menta Oscuro
-  Color(0xFFD45C50), // Coral Oscuro
-  Color(0xFF987298), // Lila Oscuro
-  Color(0xFF5A9AC0), // Azul Cielo Oscuro
+  Color(0xFF2E7D32), // Verde
+  Color(0xFF0288D1), // Azul Claro
+  Color(0xFFF57C00), // Púrpura
 ];
 
   @override
@@ -34,7 +32,7 @@ class _SurveyCardState extends State<SurveyCard> {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
       child: Material(
-        color: colors[Random().nextInt(5)],
+        color: colors[Random().nextInt(3)],
         borderRadius: BorderRadius.circular(8.0),
         child: InkWell(
           onTap: widget.onPressed,

@@ -1,5 +1,6 @@
 import 'package:encuestor/components/primary_button.dart';
 import 'package:encuestor/components/secondary_button.dart';
+import 'package:encuestor/components/survey_text_field.dart';
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ class SurveyEditCard extends StatefulWidget {
 
 class _SurveyEditCardState extends State<SurveyEditCard> {
   var showInfo = false;
+  var isEditable = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: GestureDetector(
-            onTap: (){
+            onTap: () {
               setState(() {
                 showInfo = !showInfo;
               });
@@ -46,13 +48,63 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                         "Una pregunta muy larga que hizo el profesor para joder",
                         style: TextStyles.bodyProfesor,
                       ),
-                      Text("* primera jodida", style: TextStyles.bodyProfesor),
-                      Text("* segunda jodida", style: TextStyles.bodyProfesor),
-                      Text("* tercera jodida", style: TextStyles.bodyProfesor),
+                      SurveyTextField(isEditable: isEditable, text: "input 1"),
+                      SurveyTextField(isEditable: isEditable, text: "input 1"),
+                      SurveyTextField(isEditable: isEditable, text: "input 1"),
+                      SurveyTextField(isEditable: isEditable, text: "input 1"),
                       Padding(
-                        padding: const EdgeInsets.only(top:8.0),
-                        child: SecondaryButton(text: "Edit", height: 40, horizontalPadding: 0, onPressed: (){}),
-                      )
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: isEditable
+                            ? Column(
+                                spacing: 8,
+                                children: [
+                                  SecondaryButton(
+                                    text: "Agregar opción",
+                                    onPressed: () {},
+                                    horizontalPadding: 0,
+                                    height: 40,
+                                  ),
+                                  Row(
+                                    spacing: 8,
+                                    children: [
+                                      Expanded(
+                                        child: SecondaryButton(
+                                          text: "Cancelar",
+                                          onPressed: () {
+                                            setState(() {
+                                              isEditable = false;
+                                            });
+                                          },
+                                          backgroundColor:
+                                              AppColor.cancelButtonBackground,
+                                          borderColor: AppColor.darkGreen,
+                                          horizontalPadding: 0,
+                                          height: 40,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: PrimaryButton(
+                                          text: "Guardar",
+                                          onPressed: () {},
+                                          horizontalPadding: 0,
+                                          height: 40,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : SecondaryButton(
+                                text: "Edit",
+                                height: 40,
+                                horizontalPadding: 0,
+                                onPressed: () {
+                                  setState(() {
+                                    isEditable = true;
+                                  });
+                                },
+                              ),
+                      ),
                     ],
                   ),
               ],

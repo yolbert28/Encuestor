@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
 class AppColor {
-  static const primary = Color(0xFF006fff);
+  static const primary = Color(0xFF1E4496);
   static const primaryP = Color(0xFF075e54);
 
   static const background = Color(0xFFD3E0F0);
   static const backgroundP = Color(0xFFC1D5D3);
 
-  static const accent = Color(0xFFff851b);
-  static const secondaryButtonBackground = Color.fromARGB(95, 255, 133, 27);
+  static const accent = Color(0xFFD3721C);
+  // static const accent = Color(0xFFff851b);
+  static const secondaryButtonBackground = Color(0x5FFF851B);
+  static const disableSurveyTextField = Color.fromARGB(189, 3, 44, 39);
+
+
+  // static const cancelButtonBackground = Color.fromARGB(159, 199, 20, 20);
+  static const cancelButtonBackground = Color.fromARGB(134, 3, 44, 39);
+  static const darkGreen = Color.fromARGB(255, 5, 103, 93);
 
   static const hint = Color(0xFF707070);
   static const lightGrey = Color(0xFF7E8492);
@@ -22,7 +29,6 @@ class AppColor {
 
   static const white = Color(0xFFFFFFFF);
   static const green = Color(0xFF4CAF50);
-  static const red = Color(0xFFF44336);
   static const blue = Color(0xFF2196F3);
   static const orange = Color(0xFFFF9800);
 
