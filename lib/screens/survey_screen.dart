@@ -4,11 +4,11 @@ import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
 import 'package:encuestor/domain/survey.dart';
 import 'package:encuestor/domain/survey_option.dart';
-import 'package:encuestor/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class SurveyScreen extends StatefulWidget {
-  const SurveyScreen({super.key});
+  final String subjectId;
+  const SurveyScreen({super.key, required this.subjectId});
 
   @override
   State<SurveyScreen> createState() => _SurveyScreenState();
@@ -241,11 +241,11 @@ class _SurveyScreenState extends State<SurveyScreen> {
                           PrimaryButton(
                             text: "Aceptar",
                             onPressed: () {
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(builder: (context) => const HomeScreen()),
-                                (Route<dynamic> route) => false,
-                              );
+                              // Navigator.pushAndRemoveUntil(
+                              //   context,
+                              //   MaterialPageRoute(builder: (context) => const HomeScreen()),
+                              //   (Route<dynamic> route) => false,
+                              // );
                             },
                           ),
                         ],

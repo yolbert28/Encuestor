@@ -2,7 +2,9 @@ import 'package:encuestor/components/animated_switch.dart';
 import 'package:encuestor/components/app_text_field.dart';
 import 'package:encuestor/components/primary_button.dart';
 import 'package:encuestor/core/app_color.dart';
-import 'package:encuestor/screens/home_profesor_screen.dart';
+import 'package:encuestor/data/professor_repository.dart';
+import 'package:encuestor/data/students_repository.dart';
+import 'package:encuestor/screens/home_professor_screen.dart';
 import 'package:encuestor/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +16,90 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _idController = TextEditingController();
+  final StudentsRepository _studentsRepository = StudentsRepository();
+  final ProfessorRepository _professorRepository = ProfessorRepository();
+
+
   var isProfesor = false;
+  //
+
+  bool _isLoading = false;
+
+  void _login() async {
+    final id = _idController.text.trim();
+
+    if (id.isEmpty) {
+      _showError("Por favor, ingrese su cédula.");
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    if (isProfesor) {
+      // Lógica para profesor (sin cambios)
+      try {
+        final professorDoc = await _professorRepository.getProfessor(id);
+
+        if(professorDoc == null){
+          _showError("Cédula de profesor no encontrada.");
+          return;
+        }
+
+        print("ssss ${professorDoc.name}  ${professorDoc.password} ${professorDoc.isAdmin.toString()}");
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) =>  HomeProfesorScreen(professorId: id,)),
+        );
+      } catch (e) {
+        _showError("Ocurrió un error al verificar el profesor. $e");
+      }
+    } else {
+      // Lógica para estudiante
+      try {
+        final studentDoc = await _studentsRepository.getStudent(id);
+        if (studentDoc != null) {
+          // Comprobamos si la lista de materias no está vacía antes de acceder a ella.
+          if (studentDoc.enrolledSubjects.isNotEmpty) {
+            print(
+              "ssstudent: ${studentDoc.enrolledSubjects.first.subjectId}",
+            );
+          } else {
+            print("ssstudent: El estudiante no tiene materias inscritas.");
+          }
+          // Imprimimos el ID que estamos enviando a HomeScreen
+          print("LoginScreen: Navegando con studentId: '${id.trim()}'");
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(studentId: id.trim()),
+            ),
+          );
+        } else {
+          _showError("Cédula de estudiante no encontrada.");
+        }
+      } catch (e) {
+        _showError("Ocurrió un error al verificar el estudiante. $e");
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  //
 
   @override
   Widget build(BuildContext context) {
@@ -51,24 +136,38 @@ class _LoginScreenState extends State<LoginScreen> {
                 });
               },
             ),
-            AppTextField(hintText: "Cédula"),
-            AppTextField(hintText: "Contraseña", enabled: isProfesor),
-            PrimaryButton(
-              text: "Ingresar",
-              onPressed: () {
-                if (isProfesor) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeProfesorScreen()),
-                  );
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
-                  );
-                }
-              },
+
+            AppTextField(hintText: "Cédula", controller: _idController),
+
+            AppTextField(
+              hintText: "Contraseña",
+              enabled: isProfesor,
+              controller: null,
             ),
+
+            _isLoading
+                ? const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(color: Colors.white),
+                  )
+                : PrimaryButton(text: "Ingresar", onPressed: _login),
+
+            // PrimaryButton(
+            //   text: "Ingresar",
+            //   onPressed: () {
+            //     if (isProfesor) {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => HomeProfesorScreen()),
+            //       );
+            //     } else {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => HomeScreen()),
+            //       );
+            //     }
+            //   },
+            // ),
           ],
         ),
       ),
