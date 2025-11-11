@@ -174,6 +174,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
     final bool isLastPage = (_currentPage + 1) * _pageSize >= survey.length;
 
     return Scaffold(
+      backgroundColor: AppColor.background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: AppColor.primary,

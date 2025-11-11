@@ -6,10 +6,8 @@ import 'package:flutter/material.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform
-  );
-  
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MainApp());
 }
 
@@ -18,10 +16,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
-    return MaterialApp(
-      home: LoginScreen()
-    );
+    return MaterialApp(home: LoginScreen());
   }
 }
- 

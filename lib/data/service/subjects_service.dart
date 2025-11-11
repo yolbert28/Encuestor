@@ -24,7 +24,7 @@ class SubjectsService {
   ///
   /// Esto es útil para obtener todas las asignaturas en las que un estudiante
   /// está inscrito.
-  Future<QuerySnapshot> getSubjectsByIds(List<String> subjectIds) async {
+  Future<QuerySnapshot<Subject>> getSubjectsByIds(List<String> subjectIds) async {
     if (subjectIds.isEmpty) {
       // Retorna una instantánea vacía si no hay IDs para evitar errores.
       return _subjectsCollection.where(FieldPath.documentId, whereIn: ['_']).get();

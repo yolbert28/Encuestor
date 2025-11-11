@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:encuestor/components/survey_card.dart';
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
-import 'package:encuestor/data/service/students_service.dart';
-import 'package:encuestor/data/service/subjects_service.dart';
+import 'package:encuestor/data/students_repository.dart';
+import 'package:encuestor/domain/subject.dart';
 import 'package:encuestor/screens/survey_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -16,11 +15,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final StudentsService _studentsService = StudentsService();
-  final SubjectsService _subjectsService = SubjectsService();
+  final StudentsRepository _studentsRepository = StudentsRepository();
 
   bool _isLoading = true;
-  List<QueryDocumentSnapshot> _availableSubjects = [];
+  List<Subject> _availableSubjects = [];
 
   @override
   void initState() {
@@ -30,36 +28,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadAvailableSurveys() async {
     try {
-      // 1. Obtener los datos del estudiante
-      // Imprimimos el ID que estamos usando para la consulta
-      print("HomeScreen: Buscando estudiante con ID: '${widget.studentId}'");
-      final studentDoc = await _studentsService.getStudent(widget.studentId);
 
-      final studentData = studentDoc.data() as Map<String, dynamic>;
-      // print("sssss: " + studentDoc.toString());
-      final List<dynamic> enrolledSubjects =
-          studentData['enrolled_subjects'] ?? [];
-
-      // 2. Filtrar para obtener solo los IDs de las materias no respondidas
-      final List<String> subjectIdsToFetch = enrolledSubjects
-          .where((subject) => subject['responded'] == false)
-          .map((subject) => subject['subject_id'] as String)
-          .toList();
-
-      if (subjectIdsToFetch.isEmpty) {
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
-
-      // 3. Obtener los detalles de esas materias
-      final subjectsSnapshot = await _subjectsService.getSubjectsByIds(
-        subjectIdsToFetch,
-      );
+      final surveys = await _studentsRepository.getSubjectsForStudent(widget.studentId);
 
       setState(() {
-        _availableSubjects = subjectsSnapshot.docs;
+        _availableSubjects = surveys;
         _isLoading = false;
       });
     } catch (e) {
@@ -88,8 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.only(
           top: 24,
           bottom: 16,
-          left: 16,
-          right: 16,
         ),
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
@@ -101,38 +72,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   textAlign: TextAlign.center,
                 ),
               )
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Text("Encuestas disponibles", style: TextStyles.title),
-                    const SizedBox(height: 16),
-                    ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+            : Column(
+                children: [
+                  Text("Encuestas disponibles", style: TextStyles.title),
+                  const SizedBox(height: 16),
+                  Expanded( // <-- Widget clave añadido
+                    child: ListView.separated(
                       itemCount: _availableSubjects.length,
                       separatorBuilder: (context, index) =>
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 8),
                       itemBuilder: (context, index) {
                         final subject = _availableSubjects[index];
-                        final subjectData =
-                            subject.data() as Map<String, dynamic>;
                         return SurveyCard(
-                          title: subjectData['name'] ?? 'Sin nombre',
-                          info: subjectData['info'] ?? 'Sin información',
+                          title: subject.name,
+                          info: subject.info,
                           onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    SurveyScreen(subjectId: subject.id),
+                                builder: (context) => SurveyScreen(subjectId: subject.id,),
                               ),
                             );
                           },
                         );
                       },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
       ),
     );

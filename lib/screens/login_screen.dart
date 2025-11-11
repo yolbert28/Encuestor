@@ -60,18 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       // Lógica para estudiante
       try {
-        final studentDoc = await _studentsRepository.getStudent(id);
-        if (studentDoc != null) {
-          // Comprobamos si la lista de materias no está vacía antes de acceder a ella.
-          if (studentDoc.enrolledSubjects.isNotEmpty) {
-            print(
-              "ssstudent: ${studentDoc.enrolledSubjects.first.subjectId}",
-            );
-          } else {
-            print("ssstudent: El estudiante no tiene materias inscritas.");
-          }
-          // Imprimimos el ID que estamos enviando a HomeScreen
-          print("LoginScreen: Navegando con studentId: '${id.trim()}'");
+        final studentExists = await _studentsRepository.studentExists(id);
+        if (studentExists) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(

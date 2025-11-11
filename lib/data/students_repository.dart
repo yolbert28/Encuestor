@@ -1,31 +1,27 @@
 import 'package:encuestor/data/service/students_service.dart';
-import 'package:encuestor/domain/student.dart';
+import 'package:encuestor/data/service/subjects_service.dart';
 import 'package:encuestor/domain/student_subject.dart';
+import 'package:encuestor/domain/subject.dart';
 
 class StudentsRepository {
-
   final service = StudentsService();
+  final subjectsService = SubjectsService();
 
   // El tipo de retorno ahora es Future<Student?> para manejar el caso donde el estudiante no existe.
-  Future<Student?> getStudent(String studentId) async {
+  Future<bool> studentExists(String studentId) async {
     final studentDoc = await service.getStudent(studentId);
 
-    if (studentDoc.exists) {
-      // .data() ya devuelve un objeto Student gracias al conversor, no se necesita 'as Student'.
-      return studentDoc.data();
-    }
-    // Si el documento no existe, retornamos null.
-    return null;
+    return studentDoc.exists;
   }
 
-  // Nuevo método para obtener directamente la lista de materias de un estudiante.
-  Future<List<StudentSubject>> getStudentSubjects(String studentId) async {
-    // Reutilizamos el método que ya teníamos.
-    final student = await getStudent(studentId);
+  Future<List<Subject>> getSubjectsForStudent(String studentId) async {
+    
+    final subjectsId = await service.getSubjectsForStudentStream(studentId);
 
-    // Si el estudiante existe, devolvemos su lista de materias.
-    // Si no existe (o no tiene materias), devolvemos una lista vacía.
-    return student?.enrolledSubjects ?? [];
+    final subjects = await subjectsService.getSubjectsByIds(subjectsId.docs.map((doc) => doc.id).toList());
+
+    final result = subjects.docs.map((doc) => doc.data()).toList();
+
+    return result;
   }
-
 }
