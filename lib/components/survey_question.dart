@@ -1,21 +1,21 @@
 import 'package:encuestor/components/survey_question_option.dart';
 import 'package:encuestor/core/text_style.dart';
-import 'package:encuestor/domain/survey.dart';
+import 'package:encuestor/domain/question.dart';
 import 'package:flutter/material.dart';
 
 class SurveyQuestion extends StatefulWidget {
-  final Survey survey;
+  final Question question;
   final String questionNumber;
-  final Function(int?) onChanged;
+  final Function(String?) onChanged;
 
-  const SurveyQuestion({super.key, required this.questionNumber, required this.survey, required this.onChanged});
+  const SurveyQuestion({super.key, required this.questionNumber, required this.question, required this.onChanged});
 
   @override
   State<SurveyQuestion> createState() => _SurveyQuestionState();
 }
 
 class _SurveyQuestionState extends State<SurveyQuestion> {
-  int? groupValue = 0;
+  String? groupValue = "";
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class _SurveyQuestionState extends State<SurveyQuestion> {
             children: [
               Text("Pregunta ${widget.questionNumber}", style: TextStyles.subtitle),
               Text(
-                widget.survey.question,
+                widget.question.question,
               ),
             ],
           ),
@@ -44,8 +44,8 @@ class _SurveyQuestionState extends State<SurveyQuestion> {
             },
             groupValue: groupValue,
             child: Column(
-              children: widget.survey.options
-                  .map((option) => SurveyQuestionOption(text: option.text, value: int.parse(option.id)))
+              children: widget.question.options
+                  .map((option) => SurveyQuestionOption(text: option.text, value: option.id))
                   .toList(),
             ),
           ),

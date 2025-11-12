@@ -1,18 +1,23 @@
+import 'package:encuestor/components/icon_button_app.dart';
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
 import 'package:flutter/material.dart';
 
-class SurveyTextField extends StatefulWidget {
+class SurveyAddTextField extends StatefulWidget {
   final bool isEditable;
   final String text;
 
-  const SurveyTextField({super.key, required this.isEditable, required this.text});
+  const SurveyAddTextField({
+    super.key,
+    required this.isEditable,
+    required this.text,
+  });
 
   @override
-  State<SurveyTextField> createState() => _SurveyTextFieldState();
+  State<SurveyAddTextField> createState() => _SurveyAddTextFieldState();
 }
 
-class _SurveyTextFieldState extends State<SurveyTextField> {
+class _SurveyAddTextFieldState extends State<SurveyAddTextField> {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -25,9 +30,7 @@ class _SurveyTextFieldState extends State<SurveyTextField> {
         ),
         Expanded(
           child: TextField(
-            controller: TextEditingController(
-              text: widget.text
-            ),
+            controller: TextEditingController(text: widget.text),
             maxLines: null,
             style: TextStyles.body,
             decoration: InputDecoration(
@@ -42,6 +45,11 @@ class _SurveyTextFieldState extends State<SurveyTextField> {
             ),
             enabled: widget.isEditable,
           ),
+        ),
+
+        IconButtonApp(
+          onPressed: () {},
+          child: Icon(Icons.delete, color: AppColor.white),
         ),
       ],
     );

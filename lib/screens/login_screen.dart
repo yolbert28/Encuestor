@@ -20,7 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final StudentsRepository _studentsRepository = StudentsRepository();
   final ProfessorRepository _professorRepository = ProfessorRepository();
 
-
   var isProfesor = false;
   //
 
@@ -43,16 +42,19 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         final professorDoc = await _professorRepository.getProfessor(id);
 
-        if(professorDoc == null){
+        if (professorDoc == null) {
           _showError("Cédula de profesor no encontrada.");
+          setState(() {
+            _isLoading = false;
+          });
           return;
         }
 
-        print("ssss ${professorDoc.name}  ${professorDoc.password} ${professorDoc.isAdmin.toString()}");
-
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) =>  HomeProfesorScreen(professorId: id,)),
+          MaterialPageRoute(
+            builder: (context) => HomeProfesorScreen(professorId: id),
+          ),
         );
       } catch (e) {
         _showError("Ocurrió un error al verificar el profesor. $e");

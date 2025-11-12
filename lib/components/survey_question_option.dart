@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class SurveyQuestionOption extends StatefulWidget {
   final String text;
-  final int value;
+  final String value;
 
   const SurveyQuestionOption({
     super.key,

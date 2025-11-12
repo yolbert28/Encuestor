@@ -26,7 +26,6 @@ class AnimatedSwitch extends StatefulWidget {
 class _AnimatedSwitchState extends State<AnimatedSwitch> with SingleTickerProviderStateMixin {
   late bool _isRightSelected;
   late AnimationController _animationController;
-  late Animation<Alignment> _alignmentAnimation;
 
   @override
   void initState() {
@@ -35,16 +34,6 @@ class _AnimatedSwitchState extends State<AnimatedSwitch> with SingleTickerProvid
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 250),
-    );
-
-    _alignmentAnimation = AlignmentTween(
-      begin: Alignment.centerLeft,
-      end: Alignment.centerRight,
-    ).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeInOut,
-      ),
     );
 
     if (_isRightSelected) {

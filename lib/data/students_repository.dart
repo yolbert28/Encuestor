@@ -1,6 +1,5 @@
 import 'package:encuestor/data/service/students_service.dart';
 import 'package:encuestor/data/service/subjects_service.dart';
-import 'package:encuestor/domain/student_subject.dart';
 import 'package:encuestor/domain/subject.dart';
 
 class StudentsRepository {
@@ -11,14 +10,15 @@ class StudentsRepository {
   Future<bool> studentExists(String studentId) async {
     final studentDoc = await service.getStudent(studentId);
 
-    return studentDoc.exists;
+    return studentDoc.docs.isNotEmpty;
   }
 
   Future<List<Subject>> getSubjectsForStudent(String studentId) async {
-    
     final subjectsId = await service.getSubjectsForStudentStream(studentId);
 
-    final subjects = await subjectsService.getSubjectsByIds(subjectsId.docs.map((doc) => doc.id).toList());
+    print("sss ids: ${subjectsId.docs.map((doc) => doc.data().subjectId).toList()}");
+
+    final subjects = await subjectsService.getSubjectsByIds(subjectsId.docs.map((doc) => doc.data().subjectId).toList());
 
     final result = subjects.docs.map((doc) => doc.data()).toList();
 

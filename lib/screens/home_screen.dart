@@ -28,8 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadAvailableSurveys() async {
     try {
-
-      final surveys = await _studentsRepository.getSubjectsForStudent(widget.studentId);
+      final surveys = await _studentsRepository.getSubjectsForStudent(
+        widget.studentId,
+      );
 
       setState(() {
         _availableSubjects = surveys;
@@ -58,12 +59,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       backgroundColor: AppColor.background,
       body: Padding(
-        padding: const EdgeInsets.only(
-          top: 24,
-          bottom: 16,
-        ),
+        padding: const EdgeInsets.only(top: 24, bottom: 16),
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(
+                child: CircularProgressIndicator(color: AppColor.primary),
+              )
             : _availableSubjects.isEmpty
             ? Center(
                 child: Text(
@@ -76,7 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text("Encuestas disponibles", style: TextStyles.title),
                   const SizedBox(height: 16),
-                  Expanded( // <-- Widget clave añadido
+                  Expanded(
+                    // <-- Widget clave añadido
                     child: ListView.separated(
                       itemCount: _availableSubjects.length,
                       separatorBuilder: (context, index) =>
@@ -90,7 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SurveyScreen(subjectId: subject.id,),
+                                builder: (context) =>
+                                    SurveyScreen(studentId: widget.studentId, subject: subject),
                               ),
                             );
                           },

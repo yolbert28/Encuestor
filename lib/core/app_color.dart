@@ -28,7 +28,7 @@ class AppColor {
   static const surveyEditCardBackground = Color(0x85016458);
 
   static const white = Color(0xFFFFFFFF);
-  static const green = Color(0xFF4CAF50);
+  static const red = Color.fromARGB(255, 109, 17, 17);
   static const blue = Color(0xFF2196F3);
   static const orange = Color(0xFFFF9800);
 

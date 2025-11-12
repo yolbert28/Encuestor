@@ -56,23 +56,16 @@ Almacena todas las preguntas, vinculadas a una asignatura. Las opciones se anida
 
 ---
 
-### 4. Colección `students`
+### 4. Colección `enrolled_subjects`
 
 Guarda la información de los estudiantes y, crucialmente, el estado de las encuestas que han respondido.
 
 ```json
 {
-  "_id": "30603453", // Document ID (puede ser la cédula)
-  "enrolled_subjects": [
-    {
-      "subject_id": "SUB101", // Referencia a la asignatura
-      "responded": false     // 'true' si ya completó la encuesta para esta materia
-    },
-    {
-      "subject_id": "SUB102",
-      "responded": true
-    }
-  ]
+  "_id": "SlsBdzIJMcEtqwRAi0R2",
+  "subject_id": "SUB101", // Referencia a la asignatura
+  "student_id": "30601662",
+  "responded": false     // 'true' si ya completó la encuesta para esta materia
 }
 ```
 
