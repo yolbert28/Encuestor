@@ -3,18 +3,95 @@ import 'package:encuestor/components/secondary_button.dart';
 import 'package:encuestor/components/survey_text_field.dart';
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
+import 'package:encuestor/data/question_repository.dart';
+import 'package:encuestor/domain/question.dart';
+import 'package:encuestor/domain/question_option.dart';
 import 'package:flutter/material.dart';
 
 class SurveyEditCard extends StatefulWidget {
-  const SurveyEditCard({super.key});
+  final int index;
+  final Question question;
+  final VoidCallback onSaveChanges; // 1. Añadimos el callback
+  const SurveyEditCard({
+    super.key,
+    required this.question,
+    required this.index,
+    required this.onSaveChanges,
+  });
 
   @override
   State<SurveyEditCard> createState() => _SurveyEditCardState();
 }
 
 class _SurveyEditCardState extends State<SurveyEditCard> {
+  final _questionRepository = QuestionRepository();
   var showInfo = false;
   var isEditable = false;
+  bool _isSaving = false;
+
+  // Mapa para almacenar los cambios de texto temporalmente
+  late Map<String, String> _editedOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    // Inicializamos el mapa con los valores originales
+    _editedOptions = {
+      for (var option in widget.question.options) option.id: option.text,
+    };
+  }
+
+  void _handleSave() async {
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      // 1. Crear la nueva lista de opciones con los textos actualizados
+      final updatedOptions = widget.question.options.map((originalOption) {
+        return QuestionOption(
+          id: originalOption.id,
+          text: _editedOptions[originalOption.id] ?? originalOption.text,
+        );
+      }).toList();
+
+      // 2. Llamar al repositorio para guardar los cambios en Firestore
+      await _questionRepository.updateQuestionOptions(
+        widget.question.id,
+        updatedOptions,
+      );
+
+      // 2. Llamamos al callback para notificar al padre que debe recargar
+      widget.onSaveChanges();
+
+      // 3. Salir del modo de edición
+      setState(() {
+        isEditable = false;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cambios guardados con éxito.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar los cambios: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        _isSaving = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,20 +115,29 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Pregunta 1", style: TextStyles.subtitleProfesor),
+                Text(
+                  "Pregunta ${widget.index}",
+                  style: TextStyles.subtitleProfesor,
+                ),
                 if (showInfo)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     spacing: 8,
                     children: [
                       Text(
-                        "Una pregunta muy larga que hizo el profesor para joder",
+                        widget.question.question,
                         style: TextStyles.bodyProfesor,
                       ),
-                      SurveyTextField(isEditable: isEditable, text: "input 1"),
-                      SurveyTextField(isEditable: isEditable, text: "input 1"),
-                      SurveyTextField(isEditable: isEditable, text: "input 1"),
-                      SurveyTextField(isEditable: isEditable, text: "input 1"),
+                      for (var i = 0; i < widget.question.options.length; i++)
+                        SurveyTextField(
+                          isEditable: isEditable,
+                          option: widget.question.options[i],
+                          onChanged: (newText) {
+                            // Actualizamos el mapa con el nuevo texto
+                            _editedOptions[widget.question.options[i].id] =
+                                newText;
+                          },
+                        ),
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: isEditable
@@ -72,6 +158,12 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                                           text: "Cancelar",
                                           onPressed: () {
                                             setState(() {
+                                              // Revertir cambios locales
+                                              _editedOptions = {
+                                                for (var option
+                                                    in widget.question.options)
+                                                  option.id: option.text,
+                                              };
                                               isEditable = false;
                                             });
                                           },
@@ -85,9 +177,14 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                                       Expanded(
                                         child: PrimaryButton(
                                           text: "Guardar",
-                                          onPressed: () {},
+                                          onPressed: _handleSave,
                                           horizontalPadding: 0,
                                           height: 40,
+                                          // child: _isSaving
+                                          //     ? const SizedBox(
+                                          //         height: 20, width: 20,
+                                          //         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))
+                                          //     : null),
                                         ),
                                       ),
                                     ],

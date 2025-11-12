@@ -77,7 +77,7 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
                             context,
                             MaterialPageRoute(
                               // TODO: Pasa el ID de la asignatura a la pantalla de detalles.
-                              builder: (context) => const SurveyDetailScreen(),
+                              builder: (context) => SurveyDetailScreen(subject: subject,),
                             ),
                           );
                         },

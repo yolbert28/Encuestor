@@ -3,8 +3,8 @@ import 'package:encuestor/domain/question.dart';
 import 'package:encuestor/domain/question_option.dart';
 
 class QuestionsService {
-  final CollectionReference _questionsCollection = FirebaseFirestore.instance
-      .collection('questions');
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late final CollectionReference _questionsCollection = _firestore.collection('questions');
 
   /// Obtiene todas las preguntas para una asignatura específica.
   Future<QuerySnapshot<Question>> getQuestionsForSubject(String subjectId) {
@@ -27,4 +27,24 @@ class QuestionsService {
               questionOption.toFirestore(),
         ).get();
   }
+
+    /// Actualiza las opciones de una pregunta específica.
+  Future<void> updateQuestionOptions(
+      String questionId, List<QuestionOption> newOptions) async {
+    // 1. Crea un nuevo WriteBatch.
+    WriteBatch batch = _firestore.batch();
+
+    // 2. Itera sobre cada opción que necesita ser actualizada.
+    for (final option in newOptions) {
+      // Define la referencia al documento de la opción específica.
+      final optionDocRef = _questionsCollection.doc(questionId).collection("options").doc(option.id);
+
+      // Agrega una operación de actualización al batch. No se ejecuta todavía.
+      batch.update(optionDocRef, {'text': option.text});
+    }
+
+    // 3. Ejecuta todas las operaciones en el batch de una sola vez.
+    await batch.commit();
+  }
+
 }

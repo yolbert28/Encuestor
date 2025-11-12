@@ -1,5 +1,6 @@
 import 'package:encuestor/data/service/questions_service.dart';
 import 'package:encuestor/domain/question.dart';
+import 'package:encuestor/domain/question_option.dart';
 
 class QuestionRepository {
   final service = QuestionsService();
@@ -21,5 +22,11 @@ class QuestionRepository {
     }
 
     return questions;
+  }
+
+  /// Guarda las opciones actualizadas para una pregunta.
+  Future<void> updateQuestionOptions(
+      String questionId, List<QuestionOption> newOptions) {
+    return service.updateQuestionOptions(questionId, newOptions);
   }
 }

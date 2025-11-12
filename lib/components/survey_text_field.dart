@@ -1,18 +1,26 @@
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
+import 'package:encuestor/domain/question_option.dart';
 import 'package:flutter/material.dart';
 
 class SurveyTextField extends StatefulWidget {
   final bool isEditable;
-  final String text;
+  final QuestionOption option;
+  final Function(String) onChanged;
 
-  const SurveyTextField({super.key, required this.isEditable, required this.text});
+  const SurveyTextField(
+      {super.key,
+      required this.isEditable,
+      required this.option,
+      required this.onChanged});
 
   @override
   State<SurveyTextField> createState() => _SurveyTextFieldState();
 }
 
 class _SurveyTextFieldState extends State<SurveyTextField> {
+  late final TextEditingController _controller;
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -25,9 +33,8 @@ class _SurveyTextFieldState extends State<SurveyTextField> {
         ),
         Expanded(
           child: TextField(
-            controller: TextEditingController(
-              text: widget.text
-            ),
+            controller: TextEditingController(text: widget.option.text),
+            onChanged: widget.onChanged,
             maxLines: null,
             style: TextStyles.body,
             decoration: InputDecoration(

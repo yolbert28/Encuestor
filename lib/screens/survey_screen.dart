@@ -2,6 +2,7 @@ import 'package:encuestor/components/primary_button.dart';
 import 'package:encuestor/components/survey_question.dart';
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
+import 'package:encuestor/data/answers_repository.dart';
 import 'package:encuestor/data/question_repository.dart';
 import 'package:encuestor/domain/subject.dart';
 import 'package:encuestor/domain/question.dart';
@@ -20,6 +21,7 @@ class SurveyScreen extends StatefulWidget {
 
 class _SurveyScreenState extends State<SurveyScreen> {
   final QuestionRepository _questionRepository = QuestionRepository();
+  final AnswersRepository _answersRepository = AnswersRepository();
   var response = <String, String?>{};
   List<Question> _questions = [];
 
@@ -32,9 +34,6 @@ class _SurveyScreenState extends State<SurveyScreen> {
   void initState() {
     super.initState();
     _loadAvailableQuestions();
-    for (var i = 0; i < _questions.length; i++) {
-      response[_questions[i].id] = "";
-    }
   }
 
   void _loadAvailableQuestions() async {
@@ -60,6 +59,21 @@ class _SurveyScreenState extends State<SurveyScreen> {
     }
   }
 
+  /// Verifica si todas las preguntas en la página actual tienen una respuesta.
+  bool _areAllCurrentQuestionsAnswered(List<Question> currentQuestions) {
+    // Usamos .every() para chequear que cada pregunta en la lista cumpla la condición.
+    return currentQuestions.every((question) {
+      // La condición es que la respuesta para el ID de esta pregunta no sea nula.
+      return response[question.id] != null;
+    });
+  }
+
+  void _showValidationError() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Por favor, responda todas las preguntas.')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final int startIndex = _currentPage * _pageSize;
@@ -67,7 +81,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
         ? _questions.length
         : startIndex + _pageSize;
     final List<Question> currentSurveys = _questions.sublist(
-      startIndex,
+      _questions.isEmpty ? 0 : startIndex,
       endIndex,
     );
     final bool isLastPage = (_currentPage + 1) * _pageSize >= _questions.length;
@@ -111,10 +125,9 @@ class _SurveyScreenState extends State<SurveyScreen> {
                                 question: currentSurveys[i],
                                 questionNumber: (i + 1).toString(),
                                 onChanged: (t) {
-                                  setState(() {
-                                    response[currentSurveys[i].id] = t;
-                                  });
-                                  print(response);
+                                  // No es necesario llamar a setState aquí,
+                                  // solo actualizamos el mapa de respuestas.
+                                  response[currentSurveys[i].id] = t;
                                 },
                               ),
                             ),
@@ -125,7 +138,13 @@ class _SurveyScreenState extends State<SurveyScreen> {
                   SizedBox(height: 16),
                   PrimaryButton(
                     text: isLastPage ? "Finalizar" : "Siguiente",
-                    onPressed: () {
+                    onPressed: () async {
+                      // --- INICIO DE LA VALIDACIÓN ---
+                      if (!_areAllCurrentQuestionsAnswered(currentSurveys)) {
+                        _showValidationError();
+                        return; // Detiene la ejecución si no se han respondido todas.
+                      }
+                      // --- FIN DE LA VALIDACIÓN ---
                       if (!isLastPage) {
                         setState(() {
                           _currentPage++;
@@ -136,6 +155,22 @@ class _SurveyScreenState extends State<SurveyScreen> {
                           curve: Curves.easeOut,
                         );
                       } else {
+                        // Filtramos las respuestas nulas antes de guardar.
+                        final validResponses = Map<String, String>.fromEntries(
+                            response.entries.where((e) => e.value != null).map(
+                                (e) => MapEntry(e.key, e.value as String)));
+                        try {
+                          await _answersRepository.saveAnswers(validResponses, widget.subject.id, widget.studentId);
+                        } catch (e) {
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Error al guardar las respuestas: $e')),
+                            );
+                          }
+                          return; // No continuar si hay un error
+                        }
                         // Lógica para finalizar la encuesta
                         showDialog(
                           context: context,
