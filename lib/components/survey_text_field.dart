@@ -22,6 +22,30 @@ class _SurveyTextFieldState extends State<SurveyTextField> {
   late final TextEditingController _controller;
 
   @override
+  void initState() {
+    super.initState();
+    // 1. Creamos el controlador UNA SOLA VEZ con el texto inicial.
+    _controller = TextEditingController(text: widget.option.text);
+  }
+
+  @override
+  void didUpdateWidget(covariant SurveyTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 2. Si el texto de la opción cambia desde fuera (ej. al presionar "Cancelar"),
+    // actualizamos el texto en nuestro controlador para reflejar el cambio.
+    if (widget.option.text != _controller.text) {
+      _controller.text = widget.option.text;
+    }
+  }
+
+  @override
+  void dispose() {
+    // 3. Liberamos el controlador para evitar fugas de memoria.
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +57,8 @@ class _SurveyTextFieldState extends State<SurveyTextField> {
         ),
         Expanded(
           child: TextField(
-            controller: TextEditingController(text: widget.option.text),
+            // 4. Usamos la instancia del controlador que creamos en initState.
+            controller: _controller,
             onChanged: widget.onChanged,
             maxLines: null,
             style: TextStyles.body,

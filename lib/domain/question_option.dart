@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class QuestionOption {
   final String id;
-  final String text;
+  String text;
 
   QuestionOption({
     required this.id,
@@ -24,4 +24,5 @@ class QuestionOption {
   Map<String, dynamic> toFirestore() {
     return {"text": text};
   }
+
 }

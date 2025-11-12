@@ -6,6 +6,7 @@ import 'package:encuestor/core/text_style.dart';
 import 'package:encuestor/data/question_repository.dart';
 import 'package:encuestor/domain/question.dart';
 import 'package:encuestor/domain/question_option.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 
 class SurveyEditCard extends StatefulWidget {
@@ -29,16 +30,27 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
   var isEditable = false;
   bool _isSaving = false;
 
-  // Mapa para almacenar los cambios de texto temporalmente
-  late Map<String, String> _editedOptions;
+  // Lista local para gestionar las opciones (añadir, editar, etc.)
+  late List<QuestionOption> _localOptions;
+  final _uuid = Uuid();
 
   @override
   void initState() {
     super.initState();
-    // Inicializamos el mapa con los valores originales
-    _editedOptions = {
-      for (var option in widget.question.options) option.id: option.text,
-    };
+    // Clonamos las opciones del widget a nuestra lista local.
+    _localOptions =
+        widget.question.options.toList();
+  }
+
+  void _addOption() {
+    setState(() {
+      // Creamos una nueva opción con un ID único y texto por defecto.
+      final newOption = QuestionOption(
+        id: _uuid.v4(),
+        text: 'Nueva opción',
+      );
+      _localOptions.add(newOption);
+    });
   }
 
   void _handleSave() async {
@@ -48,17 +60,10 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
 
     try {
       // 1. Crear la nueva lista de opciones con los textos actualizados
-      final updatedOptions = widget.question.options.map((originalOption) {
-        return QuestionOption(
-          id: originalOption.id,
-          text: _editedOptions[originalOption.id] ?? originalOption.text,
-        );
-      }).toList();
-
       // 2. Llamar al repositorio para guardar los cambios en Firestore
       await _questionRepository.updateQuestionOptions(
         widget.question.id,
-        updatedOptions,
+        _localOptions, // Enviamos la lista local completa.
       );
 
       // 2. Llamamos al callback para notificar al padre que debe recargar
@@ -128,14 +133,15 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                         widget.question.question,
                         style: TextStyles.bodyProfesor,
                       ),
-                      for (var i = 0; i < widget.question.options.length; i++)
+                      for (var i = 0; i < _localOptions.length; i++)
                         SurveyTextField(
                           isEditable: isEditable,
-                          option: widget.question.options[i],
+                          option: _localOptions[i],
                           onChanged: (newText) {
-                            // Actualizamos el mapa con el nuevo texto
-                            _editedOptions[widget.question.options[i].id] =
-                                newText;
+                            // Actualizamos el texto de la opción en nuestra lista local.
+                            setState(() {
+                              _localOptions[i].text = newText;
+                            });
                           },
                         ),
                       Padding(
@@ -146,7 +152,7 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                                 children: [
                                   SecondaryButton(
                                     text: "Agregar opción",
-                                    onPressed: () {},
+                                    onPressed: _addOption,
                                     horizontalPadding: 0,
                                     height: 40,
                                   ),
@@ -158,12 +164,10 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                                           text: "Cancelar",
                                           onPressed: () {
                                             setState(() {
-                                              // Revertir cambios locales
-                                              _editedOptions = {
-                                                for (var option
-                                                    in widget.question.options)
-                                                  option.id: option.text,
-                                              };
+                                              // Revertimos la lista local a la original.
+                                              _localOptions = widget.question
+                                                  .options
+                                                  .toList();
                                               isEditable = false;
                                             });
                                           },
