@@ -51,6 +51,44 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
     }
   }
 
+  Future<void> _handleDeleteQuestion(String questionId, String questionText) async {
+    final bool? confirm = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmar Eliminación'),
+        content: Text('¿Estás seguro de que deseas eliminar la pregunta: "$questionText"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await _questionRepository.deleteQuestion(questionId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Pregunta eliminada con éxito.'), backgroundColor: Colors.green),
+          );
+        }
+        _loadAvailableQuestions(); // Recargar la lista
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al eliminar la pregunta: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,8 +130,8 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                                     key: ValueKey(questions[i].id),
                                     question: questions[i],
                                     index: i + 1,
-                                    onSaveChanges:
-                                        _loadAvailableQuestions, // Pasamos la función de recarga
+                                    onSaveChanges: _loadAvailableQuestions,
+                                    onDelete: () => _handleDeleteQuestion(questions[i].id, questions[i].question),
                                   ),
                               ],
                             ),

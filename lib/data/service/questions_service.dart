@@ -7,6 +7,9 @@ class QuestionsService {
   late final CollectionReference _questionsCollection = _firestore.collection(
     'questions',
   );
+  late final CollectionReference _answersCollection = _firestore.collection(
+    'answers',
+  );
 
   /// Obtiene todas las preguntas para una asignatura específica.
   Future<QuerySnapshot<Question>> getQuestionsForSubject(String subjectId) {
@@ -91,6 +94,30 @@ class QuestionsService {
 
     // 5. Ejecuta todas las operaciones del batch.
     // Esto garantiza que o se crea la pregunta con todas sus opciones, o no se crea nada.
+    await batch.commit();
+  }
+
+  /// Elimina una pregunta, su subcolección de opciones y todas las respuestas asociadas.
+  Future<void> deleteQuestion(String questionId) async {
+    final batch = _firestore.batch();
+    final questionRef = _questionsCollection.doc(questionId);
+
+    // 1. Encuentra y elimina las respuestas asociadas a la pregunta.
+    final answersQuery = await _answersCollection.where('question_id', isEqualTo: questionId).get();
+    for (final doc in answersQuery.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // 2. Eliminar la subcolección de opciones de la pregunta.
+    final optionsQuery = await questionRef.collection('options').get();
+    for (final doc in optionsQuery.docs) {
+      batch.delete(doc.reference);
+    }
+
+    // 3. Eliminar el documento de la pregunta.
+    batch.delete(questionRef);
+
+    // 4. Ejecutar todas las operaciones de borrado en el batch.
     await batch.commit();
   }
 }

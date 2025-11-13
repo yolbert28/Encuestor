@@ -12,12 +12,14 @@ import 'package:flutter/material.dart';
 class SurveyEditCard extends StatefulWidget {
   final int index;
   final Question question;
-  final VoidCallback onSaveChanges; // 1. Añadimos el callback
+  final VoidCallback onSaveChanges;
+  final VoidCallback onDelete;
   const SurveyEditCard({
     super.key,
     required this.question,
     required this.index,
     required this.onSaveChanges,
+    required this.onDelete,
   });
 
   @override
@@ -163,6 +165,13 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                       showInfo
                           ? Icons.keyboard_arrow_up
                           : Icons.keyboard_arrow_down,
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(Icons.delete_forever_outlined, color: AppColor.red),
+                      onPressed: widget.onDelete,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
                   ],
                 ),

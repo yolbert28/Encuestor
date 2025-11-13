@@ -63,4 +63,9 @@ class QuestionRepository {
       optionIdsToDelete,
     );
   }
+
+  /// Elimina una pregunta.
+  Future<void> deleteQuestion(String questionId) async {
+    await service.deleteQuestion(questionId);
+  }
 }
