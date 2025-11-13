@@ -1,6 +1,7 @@
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
 import 'package:encuestor/data/enrolled_subjects_repository.dart';
+import 'package:encuestor/domain/student_subject.dart';
 import 'package:encuestor/domain/subject.dart';
 import 'package:flutter/material.dart';
 
@@ -83,8 +84,8 @@ class _StudentListScreenState extends State<StudentListScreen> {
             child: Text("Listado de estudiantes inscritos:", style: TextStyles.bodyProfesor, textAlign: TextAlign.start,),
           )),
           Expanded(
-            child: StreamBuilder<List<String>>(
-              stream: _repository.getEnrolledStudentIds(widget.subject.id),
+            child: StreamBuilder<List<StudentSubject>>(
+              stream: _repository.getEnrolledStudents(widget.subject.id),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
@@ -106,17 +107,65 @@ class _StudentListScreenState extends State<StudentListScreen> {
                   );
                 }
             
-                final studentIds = snapshot.data!;
+                final enrolledStudents = snapshot.data!;
             
                 return ListView.builder(
                   padding: const EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
-                  itemCount: studentIds.length,
+                  itemCount: enrolledStudents.length,
                   itemBuilder: (context, index) {
-                    final studentId = studentIds[index];
-                    return Card(
-                      child: ListTile(
-                        leading: const Icon(Icons.person, color: AppColor.primaryP),
-                        title: Text('C.I: $studentId', style: TextStyles.bodyProfesor),
+                    final enrolled = enrolledStudents[index];
+                    return Dismissible(
+                      key: Key(enrolled.id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        color: AppColor.red,
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      confirmDismiss: (direction) async {
+                        if (enrolled.responded) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('No se puede eliminar un estudiante que ya respondió la encuesta.'),
+                              backgroundColor: AppColor.textDarkProfesor,
+                            ),
+                          );
+                          return false;
+                        }
+                        return await showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text("Confirmar"),
+                              content: Text("¿Estás seguro de que deseas eliminar al estudiante con C.I: ${enrolled.studentId}?"),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(false),
+                                  child: const Text("CANCELAR"),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  child: const Text("ELIMINAR"),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      onDismissed: (direction) async {
+                        await _repository.unenrollStudent(enrolled.id);
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Estudiante C.I: ${enrolled.studentId} eliminado.')),
+                          );
+                        }
+                      },
+                      child: Card(
+                        child: ListTile(
+                          leading: const Icon(Icons.person, color: AppColor.primaryP),
+                          title: Text('C.I: ${enrolled.studentId}', style: TextStyles.bodyProfesor),
+                        ),
                       ),
                     );
                   },

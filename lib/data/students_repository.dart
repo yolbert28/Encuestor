@@ -16,8 +16,6 @@ class StudentsRepository {
   Future<List<Subject>> getSubjectsForStudent(String studentId) async {
     final subjectsId = await service.getSubjectsForStudentStream(studentId);
 
-    print("sss ids: ${subjectsId.docs.map((doc) => doc.data().subjectId).toList()}");
-
     final subjects = await subjectsService.getSubjectsByIds(subjectsId.docs.map((doc) => doc.data().subjectId).toList());
 
     final result = subjects.docs.map((doc) => doc.data()).toList();

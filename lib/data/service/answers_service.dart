@@ -35,4 +35,16 @@ class AnswersService {
     // --- 3. Ejecutar todas las operaciones en la base de datos ---
     await batch.commit();
   }
+
+  /// Obtiene un stream de los documentos de respuestas para una materia.
+  Future<QuerySnapshot<Answer>> getAnswersForSubject(String subjectId) {
+    return _firestore
+        .collection('answers')
+        .withConverter(
+          fromFirestore: Answer.fromFireStore,
+          toFirestore: (Answer answer, _) => answer.toFireStore(),
+        )
+        .where('subject_id', isEqualTo: subjectId)
+        .get();
+  }
 }

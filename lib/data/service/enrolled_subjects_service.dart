@@ -1,15 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:encuestor/domain/student_subject.dart';
 
 class EnrolledSubjectsService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  late final CollectionReference _enrolledSubjectsCollection =
-      _firestore.collection('enrolled_subjects');
+  late final CollectionReference _enrolledSubjectsCollection = _firestore
+      .collection('enrolled_subjects');
 
   /// Obtiene un stream de los documentos de estudiantes inscritos en una materia.
-  Stream<QuerySnapshot> getEnrolledStudentsStream(String subjectId) {
+  Stream<QuerySnapshot<StudentSubject>> getEnrolledStudentsStream(String subjectId) {
     return _enrolledSubjectsCollection
+        .withConverter(
+          fromFirestore: StudentSubject.fromFireStore,
+          toFirestore: (StudentSubject studentSubject, _) =>
+              studentSubject.toFirestore(),
+        )
         .where('subject_id', isEqualTo: subjectId)
         .snapshots();
+  }
+
+  /// Obtiene una única lista de los documentos de estudiantes inscritos en una materia.
+  Future<QuerySnapshot<StudentSubject>> getEnrolledStudentsFuture(String subjectId) {
+    return _enrolledSubjectsCollection
+        .withConverter(
+          fromFirestore: StudentSubject.fromFireStore,
+          toFirestore: (StudentSubject studentSubject, _) =>
+              studentSubject.toFirestore(),
+        )
+        .where('subject_id', isEqualTo: subjectId)
+        .get();
   }
 
   /// Inscribe a un nuevo estudiante en una materia.
@@ -23,5 +41,10 @@ class EnrolledSubjectsService {
 
     // Añadimos el documento a la colección. Firestore generará el ID del documento.
     await _enrolledSubjectsCollection.add(newEnrollment);
+  }
+
+  /// Elimina la inscripción de un estudiante de una materia usando su ID de documento.
+  Future<void> unenrollStudent(String enrollmentId) async {
+    await _enrolledSubjectsCollection.doc(enrollmentId).delete();
   }
 }

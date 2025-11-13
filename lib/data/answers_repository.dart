@@ -24,4 +24,10 @@ class AnswersRepository {
     // 3. Llamamos al servicio para guardar los datos en un batch.
     await _service.saveAnswers(answersToSave, subjectId, studentId);
   }
+
+  /// Obtiene todas las respuestas para una asignatura específica.
+  Future<List<Answer>> getAnswersForSubject(String subjectId) async {
+    final snapshot = await _service.getAnswersForSubject(subjectId);
+    return snapshot.docs.map((doc) => doc.data()).toList();
+  }
 }
