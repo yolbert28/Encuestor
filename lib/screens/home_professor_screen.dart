@@ -4,7 +4,7 @@ import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
 import 'package:encuestor/domain/subject.dart';
 import 'package:encuestor/data/subject_repository.dart';
-import 'package:encuestor/screens/survey_add.dart';
+import 'package:encuestor/screens/add_subject_screen.dart';
 import 'package:encuestor/screens/survey_detail_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -72,6 +72,7 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
                       return SurveyCard(
                         title: subject.name,
                         info: subject.info,
+                        color: subject.color,
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -92,7 +93,10 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SurveyAdd()),
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        AddSubjectScreen(professorId: widget.professorId),
+                  ),
                 );
               },
             ),

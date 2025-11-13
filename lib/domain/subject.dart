@@ -34,7 +34,7 @@ class Subject {
     return {
       "name": name,
       "info": info,
-      "profesor_id": professorId,
+      "professor_id": professorId,
       "color": color,
     };
   }

@@ -38,17 +38,13 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
   void initState() {
     super.initState();
     // Clonamos las opciones del widget a nuestra lista local.
-    _localOptions =
-        widget.question.options.toList();
+    _localOptions = widget.question.options.toList();
   }
 
   void _addOption() {
     setState(() {
       // Creamos una nueva opción con un ID único y texto por defecto.
-      final newOption = QuestionOption(
-        id: _uuid.v4(),
-        text: 'Nueva opción',
-      );
+      final newOption = QuestionOption(id: _uuid.v4(), text: 'Nueva opción');
       _localOptions.add(newOption);
     });
   }
@@ -109,108 +105,124 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
           color: AppColor.surveyEditCardBackground,
         ),
         width: double.infinity,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                showInfo = !showInfo;
-              });
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Pregunta ${widget.index}",
-                  style: TextStyles.subtitleProfesor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  showInfo = !showInfo;
+                });
+              },
+              behavior: HitTestBehavior.opaque, // <-- Añade esta línea
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    Text(
+                      "Pregunta ${widget.index}",
+                      style: TextStyles.subtitleProfesor,
+                    ),
+                    Spacer(),
+                    Icon(
+                      color: AppColor.textDarkProfesor,
+                      showInfo
+                          ? Icons.keyboard_arrow_up
+                          : Icons.keyboard_arrow_down,
+                    ),
+                  ],
                 ),
-                if (showInfo)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 8,
-                    children: [
-                      Text(
-                        widget.question.question,
-                        style: TextStyles.bodyProfesor,
-                      ),
-                      for (var i = 0; i < _localOptions.length; i++)
-                        SurveyTextField(
-                          isEditable: isEditable,
-                          option: _localOptions[i],
-                          onChanged: (newText) {
-                            // Actualizamos el texto de la opción en nuestra lista local.
-                            setState(() {
-                              _localOptions[i].text = newText;
-                            });
-                          },
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: isEditable
-                            ? Column(
-                                spacing: 8,
-                                children: [
-                                  SecondaryButton(
-                                    text: "Agregar opción",
-                                    onPressed: _addOption,
-                                    horizontalPadding: 0,
-                                    height: 40,
-                                  ),
-                                  Row(
-                                    spacing: 8,
-                                    children: [
-                                      Expanded(
-                                        child: SecondaryButton(
-                                          text: "Cancelar",
-                                          onPressed: () {
-                                            setState(() {
-                                              // Revertimos la lista local a la original.
-                                              _localOptions = widget.question
-                                                  .options
-                                                  .toList();
-                                              isEditable = false;
-                                            });
-                                          },
-                                          backgroundColor:
-                                              AppColor.cancelButtonBackground,
-                                          borderColor: AppColor.darkGreen,
-                                          horizontalPadding: 0,
-                                          height: 40,
-                                        ),
-                                      ),
-                                      Expanded(
-                                        child: PrimaryButton(
-                                          text: "Guardar",
-                                          onPressed: _handleSave,
-                                          horizontalPadding: 0,
-                                          height: 40,
-                                          // child: _isSaving
-                                          //     ? const SizedBox(
-                                          //         height: 20, width: 20,
-                                          //         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))
-                                          //     : null),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )
-                            : SecondaryButton(
-                                text: "Edit",
-                                height: 40,
-                                horizontalPadding: 0,
-                                onPressed: () {
-                                  setState(() {
-                                    isEditable = true;
-                                  });
-                                },
-                              ),
-                      ),
-                    ],
-                  ),
-              ],
+              ),
             ),
-          ),
+            if (showInfo)
+              Padding(
+                padding: const EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 8,
+                  children: [
+                    Text(
+                      widget.question.question,
+                      style: TextStyles.bodyProfesor,
+                    ),
+                    for (var i = 0; i < _localOptions.length; i++)
+                      SurveyTextField(
+                        isEditable: isEditable,
+                        option: _localOptions[i],
+                        onChanged: (newText) {
+                          // Actualizamos el texto de la opción en nuestra lista local.
+                          setState(() {
+                            _localOptions[i].text = newText;
+                          });
+                        },
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: isEditable
+                          ? Column(
+                              spacing: 8,
+                              children: [
+                                SecondaryButton(
+                                  text: "Agregar opción",
+                                  onPressed: _addOption,
+                                  horizontalPadding: 0,
+                                  height: 40,
+                                ),
+                                Row(
+                                  spacing: 8,
+                                  children: [
+                                    Expanded(
+                                      child: SecondaryButton(
+                                        text: "Cancelar",
+                                        onPressed: () {
+                                          setState(() {
+                                            // Revertimos la lista local a la original.
+                                            _localOptions = widget
+                                                .question
+                                                .options
+                                                .toList();
+                                            isEditable = false;
+                                          });
+                                        },
+                                        backgroundColor:
+                                            AppColor.cancelButtonBackground,
+                                        borderColor: AppColor.darkGreen,
+                                        horizontalPadding: 0,
+                                        height: 40,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: PrimaryButton(
+                                        text: "Guardar",
+                                        onPressed: _handleSave,
+                                        horizontalPadding: 0,
+                                        height: 40,
+                                        // child: _isSaving
+                                        //     ? const SizedBox(
+                                        //         height: 20, width: 20,
+                                        //         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))
+                                        //     : null),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          : SecondaryButton(
+                              text: "Edit",
+                              height: 40,
+                              horizontalPadding: 0,
+                              onPressed: () {
+                                setState(() {
+                                  isEditable = true;
+                                });
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );

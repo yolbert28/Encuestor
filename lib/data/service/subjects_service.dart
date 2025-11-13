@@ -37,4 +37,11 @@ class SubjectsService {
   Future<DocumentSnapshot> getSubject(String subjectId) {
     return _subjectsCollection.doc(subjectId).get();
   }
+
+  /// Añade una nueva asignatura a la colección 'subjects'.
+  Future<void> addSubject(Subject subject) {
+    // Firestore generará un ID de documento automáticamente si no se especifica.
+    // Usamos .set() para asegurar que los datos coincidan con nuestro modelo.
+    return _subjectsCollection.doc(subject.id).set(subject);
+  }
 }

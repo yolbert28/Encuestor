@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 class SurveyCard extends StatefulWidget {
   final String title;
   final String info;
+  final int color;
   final Function() onPressed;
 
   const SurveyCard({
     super.key,
     required this.title,
     required this.info,
+    required this.color,
     required this.onPressed,
   });
 
@@ -31,7 +33,7 @@ class _SurveyCardState extends State<SurveyCard> {
     return Padding(
       padding: const EdgeInsets.only(left: 20, right: 20),
       child: Material(
-        color: colors[Random().nextInt(3)],
+        color: colors[widget.color],
         borderRadius: BorderRadius.circular(8.0),
         child: InkWell(
           onTap: widget.onPressed,

@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:encuestor/data/service/subjects_service.dart';
 import 'package:encuestor/domain/subject.dart';
+import 'package:uuid/uuid.dart';
 
 class SubjectRepository {
   final service = SubjectsService();
+  final _uuid = Uuid();
 
   /// Obtiene un flujo de la lista de asignaturas para un profesor específico.
   ///
@@ -19,5 +23,24 @@ class SubjectRepository {
       // 5. Finalmente, convertimos el resultado en una `List<Subject>`.
       return snapshot.docs.map((doc) => doc.data()).toList();
     });
+  }
+
+  /// Añade una nueva asignatura para un profesor.
+  Future<void> addSubject({
+    required String name,
+    required String info,
+    required String professorId,
+  }) async {
+    // 1. Crea un nuevo objeto Subject con un ID único.
+    final newSubject = Subject(
+      id: _uuid.v4(),
+      name: name,
+      info: info,
+      professorId: professorId,
+      color: Random().nextInt(3)
+    );
+
+    // 2. Llama al servicio para guardar la nueva asignatura en Firestore.
+    await service.addSubject(newSubject);
   }
 }

@@ -1,10 +1,12 @@
 import 'package:encuestor/components/primary_button.dart';
+import 'package:encuestor/components/secondary_button.dart';
 import 'package:encuestor/components/survey_edit_card.dart';
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
 import 'package:encuestor/data/question_repository.dart';
 import 'package:encuestor/screens/add_question_screen.dart';
 import 'package:encuestor/domain/question.dart';
+import 'package:encuestor/screens/student_list_screen.dart';
 import 'package:encuestor/domain/subject.dart';
 import 'package:flutter/material.dart';
 
@@ -67,26 +69,23 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
             : Column(
                 spacing: 16,
                 children: [
+                  Text(widget.subject.name, style: TextStyles.titleProfesor),
                   Expanded(
                     child: SingleChildScrollView(
                       child: questions.isEmpty
                           ? Padding(
-                            padding: const EdgeInsets.only(top: 32.0),
-                            child: Center(
+                              padding: const EdgeInsets.only(top: 32.0),
+                              child: Center(
                                 child: Text(
                                   "No hay preguntas en la encuesta.",
-                                  style: TextStyles.titleProfesor,
+                                  style: TextStyles.subtitleProfesor,
                                   textAlign: TextAlign.center,
                                 ),
                               ),
-                          )
+                            )
                           : Column(
                               spacing: 16,
                               children: [
-                                Text(
-                                  widget.subject.name,
-                                  style: TextStyles.titleProfesor,
-                                ),
                                 for (var i = 0; i < questions.length; i++)
                                   SurveyEditCard(
                                     // Usamos una Key para que Flutter reconstruya el widget si la pregunta cambia
@@ -99,6 +98,18 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                               ],
                             ),
                     ),
+                  ),
+                  SecondaryButton(
+                    text: "Ver listado de estudiantes",
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              StudentListScreen(subject: widget.subject),
+                        ),
+                      );
+                    },
                   ),
                   PrimaryButton(
                     text: "Agregar Pregunta",

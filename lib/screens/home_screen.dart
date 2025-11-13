@@ -87,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return SurveyCard(
                           title: subject.name,
                           info: subject.info,
+                          color: subject.color,
                           onPressed: () {
                             Navigator.push(
                               context,
