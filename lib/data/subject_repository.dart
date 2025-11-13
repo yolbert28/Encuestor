@@ -43,4 +43,9 @@ class SubjectRepository {
     // 2. Llama al servicio para guardar la nueva asignatura en Firestore.
     await service.addSubject(newSubject);
   }
+
+  /// Elimina una asignatura y todos sus datos asociados.
+  Future<void> deleteSubject(String subjectId) async {
+    await service.deleteSubject(subjectId);
+  }
 }

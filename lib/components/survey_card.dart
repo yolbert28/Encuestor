@@ -7,6 +7,7 @@ class SurveyCard extends StatefulWidget {
   final String title;
   final String info;
   final int color;
+  final double horizontalPadding;
   final Function() onPressed;
 
   const SurveyCard({
@@ -15,6 +16,7 @@ class SurveyCard extends StatefulWidget {
     required this.info,
     required this.color,
     required this.onPressed,
+    this.horizontalPadding = 20,
   });
 
   @override
@@ -31,7 +33,7 @@ class _SurveyCardState extends State<SurveyCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20),
+      padding: EdgeInsets.symmetric(horizontal: widget.horizontalPadding),
       child: Material(
         color: colors[widget.color],
         borderRadius: BorderRadius.circular(8.0),

@@ -69,19 +69,78 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
                         const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final subject = subjects[index];
-                      return SurveyCard(
-                        title: subject.name,
-                        info: subject.info,
-                        color: subject.color,
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              // TODO: Pasa el ID de la asignatura a la pantalla de detalles.
-                              builder: (context) => SurveyDetailScreen(subject: subject,),
-                            ),
-                          );
-                        },
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Dismissible(
+                          key: Key(subject.id),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: Colors.red,
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+                          confirmDismiss: (direction) async {
+                            return await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  // backgroundColor: AppColor.primaryP,
+                                  title: Text("Confirmar",),
+                                  content: Text(
+                                      "¿Estás seguro de que deseas eliminar esta asignatura? Se borrarán todos los datos asociados (preguntas, estudiantes, respuestas)."),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: const Text("CANCELAR"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: const Text("ELIMINAR"),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          onDismissed: (direction) async {
+                            try {
+                              await _subjectRepository.deleteSubject(subject.id);
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Asignatura "${subject.name}" eliminada.')),
+                                );
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          "Error al eliminar la asignatura: $e")),
+                                );
+                              }
+                            }
+                          },
+                          child: SurveyCard(
+                            title: subject.name,
+                            info: subject.info,
+                            color: subject.color,
+                            horizontalPadding: 0,
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      SurveyDetailScreen(subject: subject),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       );
                     },
                   );
