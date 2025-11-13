@@ -48,4 +48,13 @@ class SubjectRepository {
   Future<void> deleteSubject(String subjectId) async {
     await service.deleteSubject(subjectId);
   }
+
+  /// Actualiza el nombre y la información de una asignatura.
+  Future<void> updateSubject({
+    required String subjectId,
+    required String name,
+    required String info,
+  }) async {
+    await service.updateSubject(subjectId, name, info);
+  }
 }

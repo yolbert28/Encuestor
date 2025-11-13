@@ -32,12 +32,17 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
 
   // Lista local para gestionar las opciones (añadir, editar, etc.)
   late List<QuestionOption> _localOptions;
+  // Controlador y variable local para el texto de la pregunta.
+  late TextEditingController _questionTextController;
+  late String _localQuestionText;
   final _uuid = Uuid();
 
   @override
   void initState() {
     super.initState();
     // Clonamos las opciones del widget a nuestra lista local.
+    _localQuestionText = widget.question.question;
+    _questionTextController = TextEditingController(text: _localQuestionText);
     _localOptions = widget.question.options.toList();
   }
 
@@ -49,6 +54,21 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
     });
   }
 
+  void _deleteOption(int index) {
+    // No permitir eliminar si solo quedan 2 opciones, y mostrar un mensaje.
+    if (_localOptions.length <= 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Una pregunta debe tener al menos dos opciones.'),
+          backgroundColor: AppColor.textDarkProfesor,
+        ),
+      );
+      return;
+    }
+    setState(() {
+      _localOptions.removeAt(index);
+    });
+  }
   void _handleSave() async {
     setState(() {
       _isSaving = true;
@@ -56,10 +76,17 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
 
     try {
       // 1. Crear la nueva lista de opciones con los textos actualizados
-      // 2. Llamar al repositorio para guardar los cambios en Firestore
-      await _questionRepository.updateQuestionOptions(
+      // Identificar las opciones a eliminar
+      final originalOptionIds = widget.question.options.map((o) => o.id).toSet();
+      final currentOptionIds = _localOptions.map((o) => o.id).toSet();
+      final optionIdsToDelete = originalOptionIds.difference(currentOptionIds).toList();
+
+      // 2. Llamar al repositorio para guardar el texto de la pregunta y las opciones.
+      await _questionRepository.updateQuestionAndOptions(
         widget.question.id,
-        _localOptions, // Enviamos la lista local completa.
+        _localQuestionText, // Enviamos el nuevo texto de la pregunta.
+        _localOptions,      // Enviamos la lista local de opciones.
+        optionIdsToDelete,
       );
 
       // 2. Llamamos al callback para notificar al padre que debe recargar
@@ -92,6 +119,13 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
         _isSaving = false;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    // Liberamos el controlador para evitar fugas de memoria.
+    _questionTextController.dispose();
+    super.dispose();
   }
 
   @override
@@ -141,10 +175,28 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 8,
                   children: [
-                    Text(
-                      widget.question.question,
-                      style: TextStyles.bodyProfesor,
-                    ),
+                    isEditable
+                        ? TextField(
+                            controller: _questionTextController,
+                            onChanged: (newText) {
+                              setState(() {
+                                _localQuestionText = newText;
+                              });
+                            },
+                            maxLines: null,
+                            style: TextStyles.body,
+                            cursorColor: AppColor.accent,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: AppColor.primaryP,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          )
+                        : Text(widget.question.question,
+                            style: TextStyles.bodyProfesor),
                     for (var i = 0; i < _localOptions.length; i++)
                       SurveyTextField(
                         isEditable: isEditable,
@@ -155,6 +207,7 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                             _localOptions[i].text = newText;
                           });
                         },
+                        onDelete: () => _deleteOption(i),
                       ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -177,6 +230,8 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                                         onPressed: () {
                                           setState(() {
                                             // Revertimos la lista local a la original.
+                                            _localQuestionText = widget.question.question;
+                                            _questionTextController.text = widget.question.question;
                                             _localOptions = widget
                                                 .question
                                                 .options

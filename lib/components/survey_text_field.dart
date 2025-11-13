@@ -7,12 +7,15 @@ class SurveyTextField extends StatefulWidget {
   final bool isEditable;
   final QuestionOption option;
   final Function(String) onChanged;
+  final VoidCallback? onDelete;
 
-  const SurveyTextField(
-      {super.key,
-      required this.isEditable,
-      required this.option,
-      required this.onChanged});
+  const SurveyTextField({
+    super.key,
+    required this.isEditable,
+    required this.option,
+    required this.onChanged,
+    this.onDelete,
+  });
 
   @override
   State<SurveyTextField> createState() => _SurveyTextFieldState();
@@ -48,6 +51,7 @@ class _SurveyTextFieldState extends State<SurveyTextField> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8,
       children: [
@@ -62,6 +66,7 @@ class _SurveyTextFieldState extends State<SurveyTextField> {
             onChanged: widget.onChanged,
             maxLines: null,
             style: TextStyles.body,
+            cursorColor: AppColor.accent,
             decoration: InputDecoration(
               filled: true,
               fillColor: widget.isEditable
@@ -75,6 +80,20 @@ class _SurveyTextFieldState extends State<SurveyTextField> {
             enabled: widget.isEditable,
           ),
         ),
+        if (widget.isEditable)
+          Padding(
+            padding: const EdgeInsets.only(left: 4.0, top: 4),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColor.red,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: IconButton(
+                icon: Icon(Icons.delete_outline, color: AppColor.white),
+                onPressed: widget.onDelete,
+              ),
+            ),
+          ),
       ],
     );
   }

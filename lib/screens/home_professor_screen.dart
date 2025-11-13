@@ -20,6 +20,64 @@ class HomeProfesorScreen extends StatefulWidget {
 class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
   final SubjectRepository _subjectRepository = SubjectRepository();
 
+  Future<void> _showEditSubjectDialog(BuildContext context, Subject subject) async {
+    final nameController = TextEditingController(text: subject.name);
+    final infoController = TextEditingController(text: subject.info);
+    final formKey = GlobalKey<FormState>();
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Editar Asignatura'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: 'Nombre de la asignatura'),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Por favor, ingrese un nombre';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: infoController,
+                  decoration: const InputDecoration(labelText: 'Información (Carrera)'),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Por favor, ingrese la información';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Guardar'),
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  await _subjectRepository.updateSubject(subjectId: subject.id, name: nameController.text, info: infoController.text);
+                  if (mounted) Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,37 +131,47 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Dismissible(
                           key: Key(subject.id),
-                          direction: DismissDirection.endToStart,
+                          direction: DismissDirection.horizontal,
                           background: Container(
-                            color: Colors.red,
+                            color: AppColor.primaryP,
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: const Icon(Icons.edit, color: Colors.white),
+                          ),
+                          secondaryBackground: Container(
+                            color: AppColor.red,
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.symmetric(horizontal: 20.0),
                             child: const Icon(Icons.delete, color: Colors.white),
                           ),
                           confirmDismiss: (direction) async {
-                            return await showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  // backgroundColor: AppColor.primaryP,
-                                  title: Text("Confirmar",),
-                                  content: Text(
-                                      "¿Estás seguro de que deseas eliminar esta asignatura? Se borrarán todos los datos asociados (preguntas, estudiantes, respuestas)."),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(false),
-                                      child: const Text("CANCELAR"),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(true),
-                                      child: const Text("ELIMINAR"),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
+                            if (direction == DismissDirection.startToEnd) { // Swipe a la derecha (editar)
+                              await _showEditSubjectDialog(context, subject);
+                              return false; // No elimina el elemento de la lista
+                            } else { // Swipe a la izquierda (eliminar)
+                              return await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text("Confirmar"),
+                                    content: const Text(
+                                        "¿Estás seguro de que deseas eliminar esta asignatura? Se borrarán todos los datos asociados (preguntas, estudiantes, respuestas)."),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: const Text("CANCELAR"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: const Text("ELIMINAR"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
                           },
                           onDismissed: (direction) async {
                             try {

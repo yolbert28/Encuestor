@@ -34,20 +34,24 @@ class QuestionsService {
   }
 
   /// Actualiza las opciones de una pregunta específica.
-  Future<void> updateQuestionOptions(
-    String questionId,
-    List<QuestionOption> newOptions,
-  ) async {
+  Future<void> updateQuestionAndOptions(
+      String questionId,
+      String newQuestionText,
+      List<QuestionOption> newOptions,
+      List<String> optionIdsToDelete) async {
     // 1. Crea un nuevo WriteBatch.
     WriteBatch batch = _firestore.batch();
+    final questionDocRef = _questionsCollection.doc(questionId);
+    final optionsCollectionRef = questionDocRef.collection("options");
 
-    // 2. Itera sobre cada opción que necesita ser actualizada.
+    // 2. Agrega la operación para actualizar el texto de la pregunta.
+    batch.update(questionDocRef, {'question_text': newQuestionText});
+
+
+    // 3. Itera sobre cada opción que necesita ser actualizada o creada.
     for (final option in newOptions) {
       // Define la referencia al documento de la opción, usando su ID.
-      final optionDocRef = _questionsCollection
-          .doc(questionId)
-          .collection("options")
-          .doc(option.id);
+      final optionDocRef = optionsCollectionRef.doc(option.id);
 
       // Agrega una operación 'set' al batch.
       // Esto crea el documento si no existe (nueva opción) o lo
@@ -55,7 +59,14 @@ class QuestionsService {
       batch.set(optionDocRef, option.toFirestore());
     }
 
-    // 3. Ejecuta todas las operaciones en el batch de una sola vez.
+    // 4. Itera sobre los IDs de las opciones a eliminar.
+    for (final optionId in optionIdsToDelete) {
+      final optionDocRef = optionsCollectionRef.doc(optionId);
+      // Agrega una operación 'delete' al batch.
+      batch.delete(optionDocRef);
+    }
+
+    // 5. Ejecuta todas las operaciones en el batch de una sola vez.
     await batch.commit();
   }
 

@@ -97,4 +97,12 @@ class SubjectsService {
     await batch.commit();
   }
 
+  /// Actualiza los datos de una asignatura existente.
+  Future<void> updateSubject(String subjectId, String name, String info) {
+    return _subjectsCollection.doc(subjectId).update({
+      'name': name,
+      'info': info,
+    });
+  }
+
 }

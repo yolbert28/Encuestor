@@ -8,7 +8,6 @@ class QuestionRepository {
   final _uuid = Uuid();
 
   Future<List<Question>> getQuestionsForSubject(String subjectId) async {
-
     final questionsSnapshot = await service.getQuestionsForSubject(subjectId);
 
     final result = questionsSnapshot.docs.map((doc) => doc.data()).toList();
@@ -17,9 +16,7 @@ class QuestionRepository {
 
     for (var question in result) {
       final optionsSnapshot = await service.getOptionsForQuestion(question.id);
-      question.options = optionsSnapshot.docs
-          .map((doc) => doc.data())
-          .toList();
+      question.options = optionsSnapshot.docs.map((doc) => doc.data()).toList();
       questions.add(question);
     }
 
@@ -53,8 +50,17 @@ class QuestionRepository {
   }
 
   /// Guarda las opciones actualizadas para una pregunta.
-  Future<void> updateQuestionOptions(
-      String questionId, List<QuestionOption> newOptions) {
-    return service.updateQuestionOptions(questionId, newOptions);
+  Future<void> updateQuestionAndOptions(
+    String questionId,
+    String newQuestionText,
+    List<QuestionOption> newOptions,
+    List<String> optionIdsToDelete,
+  ) async {
+    await service.updateQuestionAndOptions(
+      questionId,
+      newQuestionText,
+      newOptions,
+      optionIdsToDelete,
+    );
   }
 }
