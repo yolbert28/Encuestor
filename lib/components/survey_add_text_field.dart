@@ -32,6 +32,7 @@ class _SurveyAddTextFieldState extends State<SurveyAddTextField> {
           child: TextField(
             controller: TextEditingController(text: widget.text),
             maxLines: null,
+            cursorColor: AppColor.accent,
             style: TextStyles.body,
             decoration: InputDecoration(
               filled: true,

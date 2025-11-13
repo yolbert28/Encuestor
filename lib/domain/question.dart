@@ -22,15 +22,15 @@ class Question {
 
     return Question(
       id: snapshot.id,
-      question: data?["question_text"] as String,
-      subjectId: data?["subject_id"] as String,
+      question: data?["question_text"] ?? "",
+      subjectId: data?["subject_id"] ?? "",
       options: [],
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      "question": question,
+      "question_text": question,
       "subject_id": subjectId,
       "options": options.map((option) => option.toFirestore()).toList(),
     };

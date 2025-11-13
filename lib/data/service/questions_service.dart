@@ -58,4 +58,28 @@ class QuestionsService {
     // 3. Ejecuta todas las operaciones en el batch de una sola vez.
     await batch.commit();
   }
+
+  /// Añade una nueva pregunta y sus opciones a Firestore.
+  Future<void> addQuestion(Question newQuestion, List<QuestionOption> options) async {
+    // 1. Crea una referencia para el nuevo documento de pregunta.
+    // Firestore generará un ID único automáticamente.
+    final questionDocRef = _questionsCollection.doc(newQuestion.id);
+
+    // 2. Crea un WriteBatch para ejecutar múltiples operaciones atómicamente.
+    final batch = _firestore.batch();
+
+    // 3. Añade la operación para crear el documento de la pregunta.
+    batch.set(questionDocRef, newQuestion.toFirestore());
+
+    // 4. Añade las operaciones para crear cada documento de opción
+    //    en la subcolección 'options'.
+    for (final option in options) {
+      final optionDocRef = questionDocRef.collection('options').doc(option.id);
+      batch.set(optionDocRef, option.toFirestore());
+    }
+
+    // 5. Ejecuta todas las operaciones del batch.
+    // Esto garantiza que o se crea la pregunta con todas sus opciones, o no se crea nada.
+    await batch.commit();
+  }
 }

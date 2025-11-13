@@ -1,7 +1,9 @@
+import 'package:encuestor/components/primary_button.dart';
 import 'package:encuestor/components/survey_edit_card.dart';
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
 import 'package:encuestor/data/question_repository.dart';
+import 'package:encuestor/screens/add_question_screen.dart';
 import 'package:encuestor/domain/question.dart';
 import 'package:encuestor/domain/subject.dart';
 import 'package:flutter/material.dart';
@@ -62,37 +64,56 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
             ? const Center(
                 child: CircularProgressIndicator(color: AppColor.primaryP),
               )
-            : questions.isEmpty
-            ? Center(
-                child: Text(
-                  "No hay preguntas en la encuesta.",
-                  style: TextStyles.titleProfesor,
-                  textAlign: TextAlign.center,
-                ),
-              )
             : Column(
                 spacing: 16,
                 children: [
                   Expanded(
                     child: SingleChildScrollView(
-                      child: Column(
-                        spacing: 16,
-                        children: [
-                          Text(
-                            widget.subject.name,
-                            style: TextStyles.titleProfesor,
-                          ),
-                          for(var i = 0; i < questions.length; i++)
-                            SurveyEditCard(
-                              // Usamos una Key para que Flutter reconstruya el widget si la pregunta cambia
-                              key: ValueKey(questions[i].id),
-                              question: questions[i],
-                              index: i + 1,
-                              onSaveChanges: _loadAvailableQuestions, // Pasamos la función de recarga
-                            )
-                        ],
-                      ),
+                      child: questions.isEmpty
+                          ? Padding(
+                            padding: const EdgeInsets.only(top: 32.0),
+                            child: Center(
+                                child: Text(
+                                  "No hay preguntas en la encuesta.",
+                                  style: TextStyles.titleProfesor,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                          )
+                          : Column(
+                              spacing: 16,
+                              children: [
+                                Text(
+                                  widget.subject.name,
+                                  style: TextStyles.titleProfesor,
+                                ),
+                                for (var i = 0; i < questions.length; i++)
+                                  SurveyEditCard(
+                                    // Usamos una Key para que Flutter reconstruya el widget si la pregunta cambia
+                                    key: ValueKey(questions[i].id),
+                                    question: questions[i],
+                                    index: i + 1,
+                                    onSaveChanges:
+                                        _loadAvailableQuestions, // Pasamos la función de recarga
+                                  ),
+                              ],
+                            ),
                     ),
+                  ),
+                  PrimaryButton(
+                    text: "Agregar Pregunta",
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              AddQuestionScreen(subjectId: widget.subject.id),
+                        ),
+                      );
+                      if (result == true) {
+                        _loadAvailableQuestions();
+                      }
+                    },
                   ),
                 ],
               ),
