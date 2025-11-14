@@ -143,23 +143,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: CircularProgressIndicator(color: Colors.white),
                   )
                 : PrimaryButton(text: "Ingresar", onPressed: _login),
-
-            // PrimaryButton(
-            //   text: "Ingresar",
-            //   onPressed: () {
-            //     if (isProfesor) {
-            //       Navigator.push(
-            //         context,
-            //         MaterialPageRoute(builder: (context) => HomeProfesorScreen()),
-            //       );
-            //     } else {
-            //       Navigator.push(
-            //         context,
-            //         MaterialPageRoute(builder: (context) => HomeScreen()),
-            //       );
-            //     }
-            //   },
-            // ),
           ],
         ),
       ),
