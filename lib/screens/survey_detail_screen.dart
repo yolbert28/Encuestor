@@ -394,7 +394,8 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Row(
-                          spacing: 12,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          spacing: (MediaQuery.of(context).size.width * 0.04),
                           children: [
                             SecondaryButton(
                               text: "Ver listado de estudiantes",
