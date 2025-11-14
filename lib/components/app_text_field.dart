@@ -17,6 +17,14 @@ class AppTextField extends StatefulWidget {
 }
 
 class _AppTextFieldState extends State<AppTextField> {
+  bool obscureText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    obscureText = widget.obscureText;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -25,8 +33,16 @@ class _AppTextFieldState extends State<AppTextField> {
         controller: widget.controller,
         enabled: widget.enabled,
         cursorColor: AppColor.accent,
-        obscureText: widget.obscureText,
+        obscureText: obscureText,
         decoration: InputDecoration(
+          suffixIcon: widget.obscureText ?  GestureDetector(
+            onTap: () {
+              setState(() {
+                obscureText = !obscureText;
+              });
+            },
+            child: Icon( obscureText ? Icons.visibility : Icons.visibility_off, color: AppColor.hint,)
+            ) : null,
           filled: true,
           fillColor: widget.enabled ? AppColor.background : AppColor.textFieldDisabled,
           hintText: widget.hintText,

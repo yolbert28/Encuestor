@@ -30,32 +30,39 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Editar Asignatura'),
-          content: Form(
-            key: formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: 'Nombre de la asignatura'),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Por favor, ingrese un nombre';
-                    }
-                    return null;
-                  },
+          insetPadding: const EdgeInsets.all(16), // Un padding razonable para que no pegue a los bordes
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20), // Padding interno
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width, // Ocupa el ancho disponible
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: nameController,
+                      decoration: const InputDecoration(labelText: 'Nombre de la asignatura'),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Por favor, ingrese un nombre';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: infoController,
+                      decoration: const InputDecoration(labelText: 'Información (Carrera)'),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Por favor, ingrese la información';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
-                TextFormField(
-                  controller: infoController,
-                  decoration: const InputDecoration(labelText: 'Información (Carrera)'),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Por favor, ingrese la información';
-                    }
-                    return null;
-                  },
-                ),
-              ],
+              ),
             ),
           ),
           actions: <Widget>[
@@ -158,6 +165,7 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
+                                    insetPadding: const EdgeInsets.all(16),
                                     title: const Text("Confirmar"),
                                     content: const Text(
                                         "¿Estás seguro de que deseas eliminar esta asignatura? Se borrarán todos los datos asociados (preguntas, estudiantes, respuestas)."),

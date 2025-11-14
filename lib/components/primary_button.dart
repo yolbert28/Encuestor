@@ -8,9 +8,11 @@ class PrimaryButton extends StatefulWidget {
   final double horizontalPadding;
   final String text;
   final Widget child;
+  final bool onlyIcon;
+  final EdgeInsetsGeometry? innerPadding;
   final Function() onPressed;
 
-  const PrimaryButton({super.key, this.height = 60, this.width = double.infinity, this.horizontalPadding = 20,this.text = "", required this.onPressed, this.child = const SizedBox()});
+  const PrimaryButton({super.key, this.height = 60, this.width = double.infinity, this.horizontalPadding = 20,this.text = "", required this.onPressed, this.child = const SizedBox(), this.onlyIcon = false, this.innerPadding});
 
   @override
   State<PrimaryButton> createState() => _PrimaryButtonState();
@@ -26,6 +28,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
         padding: EdgeInsets.only(left: widget.horizontalPadding, right: widget.horizontalPadding),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
+            padding: widget.innerPadding,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),
             ),
@@ -35,8 +38,10 @@ class _PrimaryButtonState extends State<PrimaryButton> {
           onPressed: widget.onPressed,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(widget.text, style: TextStyles.buttonText),
+              if(!widget.onlyIcon)
+                Text(widget.text, style: TextStyles.buttonText),
               widget.child
             ]
             )

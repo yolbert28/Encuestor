@@ -66,12 +66,17 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
     }
   }
 
-  Future<void> _handleDeleteQuestion(String questionId, String questionText) async {
+  Future<void> _handleDeleteQuestion(
+    String questionId,
+    String questionText,
+  ) async {
     final bool? confirm = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirmar Eliminación'),
-        content: Text('¿Estás seguro de que deseas eliminar la pregunta: "$questionText"?'),
+        content: Text(
+          '¿Estás seguro de que deseas eliminar la pregunta: "$questionText"?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -90,12 +95,18 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
       try {
         await _questionRepository.deleteQuestion(questionId);
         messenger.showSnackBar(
-          const SnackBar(content: Text('Pregunta eliminada con éxito.'), backgroundColor: Colors.green),
+          const SnackBar(
+            content: Text('Pregunta eliminada con éxito.'),
+            backgroundColor: Colors.green,
+          ),
         );
         _loadAvailableQuestions(); // Recargar la lista
       } catch (e) {
         messenger.showSnackBar(
-          SnackBar(content: Text('Error al eliminar la pregunta: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Error al eliminar la pregunta: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -108,9 +119,13 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
 
     try {
       // 1. Obtener datos necesarios
-      final Professor? professor = await _professorRepository.getProfessor(widget.subject.professorId);
-      final List<Answer> answers = await _answersRepository.getAnswersForSubject(widget.subject.id);
-      final enrolledStudents = await _enrolledSubjectsRepository.getEnrolledStudentsList(widget.subject.id);
+      final Professor? professor = await _professorRepository.getProfessor(
+        widget.subject.professorId,
+      );
+      final List<Answer> answers = await _answersRepository
+          .getAnswersForSubject(widget.subject.id);
+      final enrolledStudents = await _enrolledSubjectsRepository
+          .getEnrolledStudentsList(widget.subject.id);
 
       // Calcular total de inscritos y respondidos
       final totalEnrolled = enrolledStudents.length;
@@ -119,7 +134,11 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
       // 2. Procesar respuestas para obtener conteos
       final Map<String, int> voteCounts = {};
       for (var answer in answers) {
-        voteCounts.update(answer.selectedOptionId, (value) => value + 1, ifAbsent: () => 1);
+        voteCounts.update(
+          answer.selectedOptionId,
+          (value) => value + 1,
+          ifAbsent: () => 1,
+        );
       }
 
       // 3. Crear el documento PDF
@@ -150,16 +169,20 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                     pw.SizedBox(height: 12),
                     pw.Text(
                       'Participación: $totalResponded de $totalEnrolled estudiantes respondieron la encuesta.',
-                      style: pw.TextStyle(font: font, fontSize: 12, color: PdfColors.grey800),
+                      style: pw.TextStyle(
+                        font: font,
+                        fontSize: 12,
+                        color: PdfColors.grey800,
+                      ),
                     ),
                     pw.Padding(
                       padding: const pw.EdgeInsets.symmetric(vertical: 16),
                       child: pw.Divider(thickness: 2),
                     ),
-                  ]
-                )
+                  ],
+                ),
               ),
-              
+
               // Contenido de preguntas y respuestas
               pw.ListView.builder(
                 itemCount: questions.length,
@@ -184,18 +207,26 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                               totalVotesForQuestion += voteCounts[opt.id] ?? 0;
                             }
 
-
                             var sortedOptions = question.options.map((opt) {
                               return MapEntry(opt, voteCounts[opt.id] ?? 0);
                             }).toList();
 
-                            sortedOptions.sort((a, b) => b.value.compareTo(a.value));
+                            sortedOptions.sort(
+                              (a, b) => b.value.compareTo(a.value),
+                            );
 
-                            final maxVotes = sortedOptions.isNotEmpty ? sortedOptions.first.value : 0;
-                            final secondMaxVotes = sortedOptions.length > 1 ? sortedOptions[1].value : -1;
+                            final maxVotes = sortedOptions.isNotEmpty
+                                ? sortedOptions.first.value
+                                : 0;
+                            final secondMaxVotes = sortedOptions.length > 1
+                                ? sortedOptions[1].value
+                                : -1;
 
                             // No hay segundo lugar si hay empate en el primero o si no hay votos
-                            final hasSecondPlace = maxVotes > 0 && secondMaxVotes > 0 && maxVotes > secondMaxVotes;
+                            final hasSecondPlace =
+                                maxVotes > 0 &&
+                                secondMaxVotes > 0 &&
+                                maxVotes > secondMaxVotes;
 
                             return question.options.map((option) {
                               final count = voteCounts[option.id] ?? 0;
@@ -206,21 +237,31 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                               PdfColor? highlightColor;
 
                               if (count > 0 && count == maxVotes) {
-                                highlightColor = PdfColors.green100; // Más votada
-                              } else if (hasSecondPlace && count == secondMaxVotes && question.options.length > 2) {
-                                highlightColor = PdfColors.amber100; // Segunda más votada
+                                highlightColor =
+                                    PdfColors.green100; // Más votada
+                              } else if (hasSecondPlace &&
+                                  count == secondMaxVotes &&
+                                  question.options.length > 2) {
+                                highlightColor =
+                                    PdfColors.amber100; // Segunda más votada
                               }
 
                               return pw.Container(
                                 color: highlightColor,
-                                padding: const pw.EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                                padding: const pw.EdgeInsets.symmetric(
+                                  vertical: 4,
+                                  horizontal: 8,
+                                ),
                                 margin: const pw.EdgeInsets.only(bottom: 2),
                                 child: pw.Row(
                                   children: [
                                     pw.Expanded(
                                       child: pw.Text(
                                         '- ${option.text}',
-                                        style: pw.TextStyle(font: font, fontSize: 12),
+                                        style: pw.TextStyle(
+                                          font: font,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
                                     pw.Container(
@@ -228,14 +269,24 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                                       alignment: pw.Alignment.centerRight,
                                       child: pw.Text(
                                         '${percentage.toStringAsFixed(1)}%',
-                                        style: pw.TextStyle(font: font, fontSize: 12, color: PdfColors.grey700),
+                                        style: pw.TextStyle(
+                                          font: font,
+                                          fontSize: 12,
+                                          color: PdfColors.grey700,
+                                        ),
                                       ),
                                     ),
                                     pw.Container(
                                       width: 70,
                                       alignment: pw.Alignment.centerRight,
-                                      child: pw.Text('$count voto(s)', style: pw.TextStyle(font: boldFont, fontSize: 12)),
-                                    )
+                                      child: pw.Text(
+                                        '$count voto(s)',
+                                        style: pw.TextStyle(
+                                          font: boldFont,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               );
@@ -254,14 +305,18 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
 
       // 4. Guardar y abrir el archivo
       final output = await getTemporaryDirectory();
-      final file = File("${output.path}/reporte_${widget.subject.name.replaceAll(' ', '_')}.pdf");
+      final file = File(
+        "${output.path}/reporte_${widget.subject.name.replaceAll(' ', '_')}.pdf",
+      );
       await file.writeAsBytes(await pdf.save());
 
       OpenFile.open(file.path);
-
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al generar el PDF: $e'), backgroundColor: Colors.red),
+        SnackBar(
+          content: Text('Error al generar el PDF: $e'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       if (mounted) {
@@ -271,7 +326,6 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +371,10 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                                     question: questions[i],
                                     index: i + 1,
                                     onSaveChanges: _loadAvailableQuestions,
-                                    onDelete: () => _handleDeleteQuestion(questions[i].id, questions[i].question),
+                                    onDelete: () => _handleDeleteQuestion(
+                                      questions[i].id,
+                                      questions[i].question,
+                                    ),
                                   ),
                               ],
                             ),
@@ -326,26 +383,49 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                   if (_isGeneratingPdf)
                     const Padding(
                       padding: EdgeInsets.all(8.0),
-                      child: CircularProgressIndicator(color: AppColor.primaryP),
+                      child: CircularProgressIndicator(
+                        color: AppColor.primaryP,
+                      ),
                     ),
                   // Solo mostramos los botones si el teclado NO está visible.
                   if (!isKeyboardVisible) ...[
-                    PrimaryButton(
-                      text: "Generar Reporte PDF",
-                      onPressed: _isGeneratingPdf ? () {} : _generatePdf,
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          spacing: 12,
+                          children: [
+                            SecondaryButton(
+                              text: "Ver listado de estudiantes",
+                              width: (MediaQuery.of(context).size.width * 0.66),
+                              horizontalPadding: 0,
+                              height: 60,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => StudentListScreen(
+                                      subject: widget.subject,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            PrimaryButton(
+                              width: (MediaQuery.of(context).size.width * 0.18),
+                              horizontalPadding: 0,
+                              height: 60,
+                              onPressed: _isGeneratingPdf ? () {} : _generatePdf,
+                              innerPadding: EdgeInsets.all(0),
+                              onlyIcon: true,
+                              child: Icon(Icons.print_rounded, size: 25, color: AppColor.backgroundP,),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    SecondaryButton(
-                      text: "Ver listado de estudiantes",
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                StudentListScreen(subject: widget.subject),
-                          ),
-                        );
-                      },
-                    ),
+
                     PrimaryButton(
                       text: "Agregar Pregunta",
                       onPressed: () async {
@@ -361,7 +441,7 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                         }
                       },
                     ),
-                  ]
+                  ],
                 ],
               ),
       ),

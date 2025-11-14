@@ -27,4 +27,9 @@ class EnrolledSubjectsRepository {
   Future<void> unenrollStudent(String enrollmentId) {
     return _service.unenrollStudent(enrollmentId);
   }
+
+  /// Verifica si un estudiante ya está inscrito en una materia.
+  Future<bool> isStudentEnrolled(String studentId, String subjectId) async {
+    return await _service.isStudentEnrolled(studentId, subjectId);
+  }
 }

@@ -22,6 +22,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          insetPadding: EdgeInsets.all(16),
           title: Text(
             'Agregar Estudiante a la materia',
             style: TextStyles.subtitleProfesor,
@@ -29,6 +30,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
           content: TextField(
             controller: _studentIdController,
             decoration: const InputDecoration(
+              // border: OutlineInputBorder( borderSide: BorderSide(color: AppColor.accent)),
               hintText: "Ingrese la cédula del estudiante",
             ),
             keyboardType: TextInputType.number,
@@ -52,7 +54,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                   messenger.showSnackBar(
                     const SnackBar(
                       content: Text("Por favor, ingrese la cédula."),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColor.red,
                     ),
                   );
                   return;
@@ -63,12 +65,26 @@ class _StudentListScreenState extends State<StudentListScreen> {
                       content: Text(
                         "La cédula debe tener entre 7 y 8 dígitos.",
                       ),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColor.red,
                     ),
                   );
                   return;
                 }
                 try {
+                  // Verificación para evitar duplicados
+                  final isAlreadyEnrolled = await _repository.isStudentEnrolled(
+                    studentId,
+                    widget.subject.id,
+                  );
+                  if (isAlreadyEnrolled) {
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        content: Text("Este estudiante ya está inscrito en la materia."),
+                        backgroundColor: AppColor.red,
+                      ),
+                    );
+                    return;
+                  }
                   await _repository.enrollStudent(studentId, widget.subject.id);
                   _studentIdController.clear();
                   navigator.pop(); // Usamos la variable guardada.
@@ -180,6 +196,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                           context: context,
                           builder: (BuildContext dialogContext) {
                             return AlertDialog(
+                              insetPadding: EdgeInsets.all(16),
                               title: const Text("Confirmar"),
                               content: Text(
                                 "¿Estás seguro de que deseas eliminar al estudiante con C.I: ${enrolled.studentId}?",

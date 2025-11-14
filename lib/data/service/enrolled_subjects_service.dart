@@ -47,4 +47,14 @@ class EnrolledSubjectsService {
   Future<void> unenrollStudent(String enrollmentId) async {
     await _enrolledSubjectsCollection.doc(enrollmentId).delete();
   }
+
+  Future<bool> isStudentEnrolled(String studentId, String subjectId) async {
+    final query = _enrolledSubjectsCollection
+        .where('student_id', isEqualTo: studentId)
+        .where('subject_id', isEqualTo: subjectId)
+        .limit(1);
+
+    final snapshot = await query.get();
+    return snapshot.docs.isNotEmpty;
+  }
 }

@@ -35,7 +35,7 @@ class _SecondaryButtonState extends State<SecondaryButton> {
             foregroundColor: AppColor.white,
           ),
           onPressed: widget.onPressed,
-          child: Text(widget.text, style: TextStyles.buttonText),
+          child: Text(widget.text, style: TextStyles.buttonText, textAlign: TextAlign.center,),
         ),
       ),
     );
