@@ -5,11 +5,12 @@ class AppTextField extends StatefulWidget {
   final String? hintText;
   final double horizontalPadding;
   final bool enabled;
+  final bool obscureText;
   final TextEditingController? controller;
 
 
 
-  const AppTextField({super.key, this.hintText, this.horizontalPadding = 20, this.enabled = true, required this.controller});
+  const AppTextField({super.key, this.hintText, this.horizontalPadding = 20, this.enabled = true, required this.controller, this.obscureText = false});
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -24,6 +25,7 @@ class _AppTextFieldState extends State<AppTextField> {
         controller: widget.controller,
         enabled: widget.enabled,
         cursorColor: AppColor.accent,
+        obscureText: widget.obscureText,
         decoration: InputDecoration(
           filled: true,
           fillColor: widget.enabled ? AppColor.background : AppColor.textFieldDisabled,

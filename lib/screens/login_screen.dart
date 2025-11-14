@@ -17,6 +17,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _idController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final StudentsRepository _studentsRepository = StudentsRepository();
   final ProfessorRepository _professorRepository = ProfessorRepository();
 
@@ -27,9 +28,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     final id = _idController.text.trim();
+    final password = _passwordController.text.trim();
 
     if (id.isEmpty) {
       _showError("Por favor, ingrese su cédula.");
+      return;
+    }
+
+    if (id.isEmpty) {
+      _showError("Por favor, ingrese su contraseña.");
       return;
     }
 
@@ -48,14 +55,16 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading = false;
           });
           return;
+        } else if (professorDoc.password == password) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeProfesorScreen(professorId: id),
+            ),
+          );
+        } else {
+          _showError("Credenciales incorrectas.");
         }
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomeProfesorScreen(professorId: id),
-          ),
-        );
       } catch (e) {
         _showError("Ocurrió un error al verificar el profesor. $e");
       }
@@ -96,7 +105,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: isProfesor ? AppColor.primaryP : AppColor.primary,
       body: AnimatedContainer(
         duration: Duration(milliseconds: 200),
         color: isProfesor ? AppColor.primaryP : AppColor.primary,
@@ -134,7 +142,8 @@ class _LoginScreenState extends State<LoginScreen> {
             AppTextField(
               hintText: "Contraseña",
               enabled: isProfesor,
-              controller: null,
+              controller: _passwordController,
+              obscureText: true,
             ),
 
             _isLoading
