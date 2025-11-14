@@ -64,6 +64,8 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+
     return Scaffold(
       backgroundColor: AppColor.backgroundP,
       appBar: AppBar(
@@ -156,14 +158,16 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
                     : null,
               ),
               const Spacer(), // Empuja el botón hacia abajo
-              PrimaryButton(
-                text: "Guardar Asignatura",
-                onPressed: _isSaving ? () {} : _saveSubject,
-                // child: _isSaving
-                //     ? const CircularProgressIndicator(color: Colors.white)
-                //     : null,
-              ),
-              const SizedBox(height: 16),
+              if (!isKeyboardVisible) ...[
+                PrimaryButton(
+                  text: _isSaving ? "" : "Guardar Asignatura",
+                  onPressed: _isSaving ? () {} : _saveSubject,
+                  child: _isSaving
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : SizedBox.shrink(),
+                ),
+                const SizedBox(height: 16),
+              ]
             ],
           ),
         ),

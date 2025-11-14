@@ -210,8 +210,11 @@ class _AddQuestionScreenState extends State<AddQuestionScreen> {
               padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
               child: PrimaryButton(
                 horizontalPadding: 0,
-                text: "Guardar Pregunta",
+                text: _isSaving ? "" : "Guardar Pregunta",
                 onPressed: _isSaving ? () {} : _saveQuestion,
+                child: _isSaving
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : SizedBox.shrink(),
               ),
             ),
           ],

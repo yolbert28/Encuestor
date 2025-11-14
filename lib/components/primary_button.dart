@@ -7,9 +7,10 @@ class PrimaryButton extends StatefulWidget {
   final double width;
   final double horizontalPadding;
   final String text;
+  final Widget child;
   final Function() onPressed;
 
-  const PrimaryButton({super.key, this.height = 60, this.width = double.infinity, this.horizontalPadding = 20, required this.text, required this.onPressed});
+  const PrimaryButton({super.key, this.height = 60, this.width = double.infinity, this.horizontalPadding = 20,this.text = "", required this.onPressed, this.child = const SizedBox()});
 
   @override
   State<PrimaryButton> createState() => _PrimaryButtonState();
@@ -32,7 +33,13 @@ class _PrimaryButtonState extends State<PrimaryButton> {
             foregroundColor: AppColor.white,
           ),
           onPressed: widget.onPressed,
-          child: Text(widget.text, style: TextStyles.buttonText),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(widget.text, style: TextStyles.buttonText),
+              widget.child
+            ]
+            )
         ),
       ),
     );

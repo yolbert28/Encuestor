@@ -112,8 +112,8 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
                   }
                   // 4. Si no hay datos o la lista está vacía, mostramos un mensaje.
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                      child: Text('No tienes asignaturas asignadas.'),
+                    return Center(
+                      child: Text('No tienes asignaturas.', style: TextStyles.subtitleProfesor,),
                     );
                   }
 

@@ -280,6 +280,8 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Verificamos si el teclado está visible. viewInsets.bottom será > 0 si lo está.
+    final isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColor.primaryP,
@@ -331,37 +333,40 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
                       padding: EdgeInsets.all(8.0),
                       child: CircularProgressIndicator(color: AppColor.primaryP),
                     ),
-                  PrimaryButton(
-                    text: "Generar Reporte PDF",
-                    onPressed: _isGeneratingPdf ? (){} : _generatePdf,
-                  ),
-                  SecondaryButton(
-                    text: "Ver listado de estudiantes",
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              StudentListScreen(subject: widget.subject),
-                        ),
-                      );
-                    },
-                  ),
-                  PrimaryButton(
-                    text: "Agregar Pregunta",
-                    onPressed: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              AddQuestionScreen(subjectId: widget.subject.id),
-                        ),
-                      );
-                      if (result == true) {
-                        _loadAvailableQuestions();
-                      }
-                    },
-                  ),
+                  // Solo mostramos los botones si el teclado NO está visible.
+                  if (!isKeyboardVisible) ...[
+                    PrimaryButton(
+                      text: "Generar Reporte PDF",
+                      onPressed: _isGeneratingPdf ? () {} : _generatePdf,
+                    ),
+                    SecondaryButton(
+                      text: "Ver listado de estudiantes",
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                StudentListScreen(subject: widget.subject),
+                          ),
+                        );
+                      },
+                    ),
+                    PrimaryButton(
+                      text: "Agregar Pregunta",
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AddQuestionScreen(subjectId: widget.subject.id),
+                          ),
+                        );
+                        if (result == true) {
+                          _loadAvailableQuestions();
+                        }
+                      },
+                    ),
+                  ]
                 ],
               ),
       ),

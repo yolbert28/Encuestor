@@ -41,7 +41,18 @@ class _StudentListScreenState extends State<StudentListScreen> {
               child: const Text('Agregar'),
               onPressed: () async {
                 final studentId = _studentIdController.text.trim();
-                if (studentId.isNotEmpty) {
+                if (studentId.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Por favor, ingrese la cédula."), backgroundColor: Colors.red),
+                  );
+                  return;
+                }
+                if (studentId.length < 7 || studentId.length > 8) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("La cédula debe tener entre 7 y 8 dígitos."), backgroundColor: Colors.red),
+                  );
+                  return;
+                }
                   try {
                     await _repository.enrollStudent(
                         studentId, widget.subject.id);
@@ -56,7 +67,6 @@ class _StudentListScreenState extends State<StudentListScreen> {
                       );
                     }
                   }
-                }
               },
             ),
           ],

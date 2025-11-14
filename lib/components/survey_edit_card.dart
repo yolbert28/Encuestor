@@ -71,6 +71,7 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
       _localOptions.removeAt(index);
     });
   }
+
   void _handleSave() async {
     setState(() {
       _isSaving = true;
@@ -79,15 +80,19 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
     try {
       // 1. Crear la nueva lista de opciones con los textos actualizados
       // Identificar las opciones a eliminar
-      final originalOptionIds = widget.question.options.map((o) => o.id).toSet();
+      final originalOptionIds = widget.question.options
+          .map((o) => o.id)
+          .toSet();
       final currentOptionIds = _localOptions.map((o) => o.id).toSet();
-      final optionIdsToDelete = originalOptionIds.difference(currentOptionIds).toList();
+      final optionIdsToDelete = originalOptionIds
+          .difference(currentOptionIds)
+          .toList();
 
       // 2. Llamar al repositorio para guardar el texto de la pregunta y las opciones.
       await _questionRepository.updateQuestionAndOptions(
         widget.question.id,
         _localQuestionText, // Enviamos el nuevo texto de la pregunta.
-        _localOptions,      // Enviamos la lista local de opciones.
+        _localOptions, // Enviamos la lista local de opciones.
         optionIdsToDelete,
       );
 
@@ -168,7 +173,10 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                     ),
                     const SizedBox(width: 8),
                     IconButton(
-                      icon: Icon(Icons.delete_forever_outlined, color: AppColor.red),
+                      icon: Icon(
+                        Icons.delete_forever_outlined,
+                        color: AppColor.red,
+                      ),
                       onPressed: widget.onDelete,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -179,7 +187,12 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
             ),
             if (showInfo)
               Padding(
-                padding: const EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
+                padding: const EdgeInsets.only(
+                  top: 0,
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 8,
@@ -204,8 +217,10 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                               ),
                             ),
                           )
-                        : Text(widget.question.question,
-                            style: TextStyles.bodyProfesor),
+                        : Text(
+                            widget.question.question,
+                            style: TextStyles.bodyProfesor,
+                          ),
                     for (var i = 0; i < _localOptions.length; i++)
                       SurveyTextField(
                         isEditable: isEditable,
@@ -239,8 +254,10 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                                         onPressed: () {
                                           setState(() {
                                             // Revertimos la lista local a la original.
-                                            _localQuestionText = widget.question.question;
-                                            _questionTextController.text = widget.question.question;
+                                            _localQuestionText =
+                                                widget.question.question;
+                                            _questionTextController.text =
+                                                widget.question.question;
                                             _localOptions = widget
                                                 .question
                                                 .options
@@ -261,11 +278,17 @@ class _SurveyEditCardState extends State<SurveyEditCard> {
                                         onPressed: _handleSave,
                                         horizontalPadding: 0,
                                         height: 40,
-                                        // child: _isSaving
-                                        //     ? const SizedBox(
-                                        //         height: 20, width: 20,
-                                        //         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2,))
-                                        //     : null),
+                                        child: _isSaving
+                                            ? const SizedBox(
+                                                height: 20,
+                                                width: 20,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      color: Colors.white,
+                                                      strokeWidth: 2,
+                                                    ),
+                                              )
+                                            : const SizedBox.shrink(),
                                       ),
                                     ),
                                   ],
