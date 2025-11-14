@@ -86,20 +86,17 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
     );
 
     if (confirm == true) {
+      final messenger = ScaffoldMessenger.of(context);
       try {
         await _questionRepository.deleteQuestion(questionId);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Pregunta eliminada con éxito.'), backgroundColor: Colors.green),
-          );
-        }
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Pregunta eliminada con éxito.'), backgroundColor: Colors.green),
+        );
         _loadAvailableQuestions(); // Recargar la lista
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al eliminar la pregunta: $e'), backgroundColor: Colors.red),
-          );
-        }
+        messenger.showSnackBar(
+          SnackBar(content: Text('Error al eliminar la pregunta: $e'), backgroundColor: Colors.red),
+        );
       }
     }
   }
@@ -110,6 +107,7 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
     });
 
     try {
+      final messenger = ScaffoldMessenger.of(context);
       // 1. Obtener datos necesarios
       final Professor? professor = await _professorRepository.getProfessor(widget.subject.professorId);
       final List<Answer> answers = await _answersRepository.getAnswersForSubject(widget.subject.id);
@@ -263,11 +261,9 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
       OpenFile.open(file.path);
 
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al generar el PDF: $e'), backgroundColor: Colors.red),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al generar el PDF: $e'), backgroundColor: Colors.red),
+      );
     } finally {
       if (mounted) {
         setState(() {

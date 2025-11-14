@@ -160,6 +160,7 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
               const Spacer(), // Empuja el botón hacia abajo
               if (!isKeyboardVisible) ...[
                 PrimaryButton(
+                  horizontalPadding: 0,
                   text: _isSaving ? "" : "Guardar Asignatura",
                   onPressed: _isSaving ? () {} : _saveSubject,
                   child: _isSaving

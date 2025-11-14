@@ -22,7 +22,10 @@ class _StudentListScreenState extends State<StudentListScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Agregar Estudiante a la materia', style: TextStyles.subtitleProfesor,),
+          title: Text(
+            'Agregar Estudiante a la materia',
+            style: TextStyles.subtitleProfesor,
+          ),
           content: TextField(
             controller: _studentIdController,
             decoration: const InputDecoration(
@@ -40,33 +43,44 @@ class _StudentListScreenState extends State<StudentListScreen> {
             TextButton(
               child: const Text('Agregar'),
               onPressed: () async {
+                // Guardamos el navigator y el messenger ANTES del await.
+                final navigator = Navigator.of(context);
+                final messenger = ScaffoldMessenger.of(context);
+
                 final studentId = _studentIdController.text.trim();
                 if (studentId.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Por favor, ingrese la cédula."), backgroundColor: Colors.red),
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text("Por favor, ingrese la cédula."),
+                      backgroundColor: Colors.red,
+                    ),
                   );
                   return;
                 }
                 if (studentId.length < 7 || studentId.length > 8) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("La cédula debe tener entre 7 y 8 dígitos."), backgroundColor: Colors.red),
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        "La cédula debe tener entre 7 y 8 dígitos.",
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
                   );
                   return;
                 }
-                  try {
-                    await _repository.enrollStudent(
-                        studentId, widget.subject.id);
-                    _studentIdController.clear();
-                    if (mounted) Navigator.of(context).pop();
-                  } catch (e) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Text("Error al agregar: $e"),
-                            backgroundColor: Colors.red),
-                      );
-                    }
-                  }
+                try {
+                  await _repository.enrollStudent(studentId, widget.subject.id);
+                  _studentIdController.clear();
+                  navigator.pop(); // Usamos la variable guardada.
+                } catch (e) {
+                  // No es necesario 'mounted' aquí porque el messenger se muestra en el contexto de la pantalla principal.
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text("Error al agregar: $e"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
             ),
           ],
@@ -89,17 +103,25 @@ class _StudentListScreenState extends State<StudentListScreen> {
           SizedBox(height: 16),
           Text(widget.subject.name, style: TextStyles.titleProfesor),
           SizedBox(height: 16),
-          SizedBox(width: double.infinity, child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Text("Listado de estudiantes inscritos:", style: TextStyles.bodyProfesor, textAlign: TextAlign.start,),
-          )),
+          SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(
+                "Listado de estudiantes inscritos:",
+                style: TextStyles.bodyProfesor,
+                textAlign: TextAlign.start,
+              ),
+            ),
+          ),
           Expanded(
             child: StreamBuilder<List<StudentSubject>>(
               stream: _repository.getEnrolledStudents(widget.subject.id),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                      child: CircularProgressIndicator(color: AppColor.primaryP));
+                    child: CircularProgressIndicator(color: AppColor.primaryP),
+                  );
                 }
                 if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
@@ -107,7 +129,11 @@ class _StudentListScreenState extends State<StudentListScreen> {
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Center(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20, bottom: 80),
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        bottom: 80,
+                      ),
                       child: Text(
                         'No hay estudiantes inscritos en esta materia.',
                         style: TextStyles.subtitleProfesor,
@@ -116,11 +142,16 @@ class _StudentListScreenState extends State<StudentListScreen> {
                     ),
                   );
                 }
-            
+
                 final enrolledStudents = snapshot.data!;
-            
+
                 return ListView.builder(
-                  padding: const EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
+                  padding: const EdgeInsets.only(
+                    top: 0,
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                  ),
                   itemCount: enrolledStudents.length,
                   itemBuilder: (context, index) {
                     final enrolled = enrolledStudents[index];
@@ -137,7 +168,9 @@ class _StudentListScreenState extends State<StudentListScreen> {
                         if (enrolled.responded) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('No se puede eliminar un estudiante que ya respondió la encuesta.'),
+                              content: Text(
+                                'No se puede eliminar un estudiante que ya respondió la encuesta.',
+                              ),
                               backgroundColor: AppColor.textDarkProfesor,
                             ),
                           );
@@ -145,17 +178,22 @@ class _StudentListScreenState extends State<StudentListScreen> {
                         }
                         return await showDialog(
                           context: context,
-                          builder: (BuildContext context) {
+                          builder: (BuildContext dialogContext) {
                             return AlertDialog(
                               title: const Text("Confirmar"),
-                              content: Text("¿Estás seguro de que deseas eliminar al estudiante con C.I: ${enrolled.studentId}?"),
+                              content: Text(
+                                "¿Estás seguro de que deseas eliminar al estudiante con C.I: ${enrolled.studentId}?",
+                              ),
                               actions: <Widget>[
                                 TextButton(
-                                  onPressed: () => Navigator.of(context).pop(false),
+                                  // Usamos el contexto del diálogo para cerrarlo.
+                                  onPressed: () =>
+                                      Navigator.of(dialogContext).pop(false),
                                   child: const Text("CANCELAR"),
                                 ),
                                 TextButton(
-                                  onPressed: () => Navigator.of(context).pop(true),
+                                  onPressed: () =>
+                                      Navigator.of(dialogContext).pop(true),
                                   child: const Text("ELIMINAR"),
                                 ),
                               ],
@@ -164,17 +202,27 @@ class _StudentListScreenState extends State<StudentListScreen> {
                         );
                       },
                       onDismissed: (direction) async {
+                        // Guardamos el messenger ANTES del await.
+                        final messenger = ScaffoldMessenger.of(context);
                         await _repository.unenrollStudent(enrolled.id);
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Estudiante C.I: ${enrolled.studentId} eliminado.')),
-                          );
-                        }
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Estudiante C.I: ${enrolled.studentId} eliminado.',
+                            ),
+                          ),
+                        );
                       },
                       child: Card(
                         child: ListTile(
-                          leading: const Icon(Icons.person, color: AppColor.primaryP),
-                          title: Text('C.I: ${enrolled.studentId}', style: TextStyles.bodyProfesor),
+                          leading: const Icon(
+                            Icons.person,
+                            color: AppColor.primaryP,
+                          ),
+                          title: Text(
+                            'C.I: ${enrolled.studentId}',
+                            style: TextStyles.bodyProfesor,
+                          ),
                         ),
                       ),
                     );

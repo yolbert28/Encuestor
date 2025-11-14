@@ -30,13 +30,16 @@ class _LoginScreenState extends State<LoginScreen> {
     final id = _idController.text.trim();
     final password = _passwordController.text.trim();
 
+    // Guardamos el messenger antes de las validaciones
+    final messenger = ScaffoldMessenger.of(context);
+
     if (id.isEmpty) {
-      _showError("Por favor, ingrese su cédula.");
+      messenger.showSnackBar(const SnackBar(content: Text("Por favor, ingrese su cédula."), backgroundColor: Colors.red));
       return;
     }
 
-    if (id.isEmpty) {
-      _showError("Por favor, ingrese su contraseña.");
+    if (isProfesor && password.isEmpty) {
+      messenger.showSnackBar(const SnackBar(content: Text("Por favor, ingrese su contraseña."), backgroundColor: Colors.red));
       return;
     }
 
@@ -50,40 +53,37 @@ class _LoginScreenState extends State<LoginScreen> {
         final professorDoc = await _professorRepository.getProfessor(id);
 
         if (professorDoc == null) {
-          _showError("Cédula de profesor no encontrada.");
-          setState(() {
-            _isLoading = false;
-          });
+          messenger.showSnackBar(const SnackBar(content: Text("Cédula de profesor no encontrada."), backgroundColor: Colors.red));
+          if (mounted) setState(() => _isLoading = false);
           return;
         } else if (professorDoc.password == password) {
-          Navigator.pushReplacement(
-            context,
+          // Usamos el context directamente aquí, pero lo guardamos si es necesario
+          Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => HomeProfesorScreen(professorId: id),
             ),
           );
         } else {
-          _showError("Credenciales incorrectas.");
+          messenger.showSnackBar(const SnackBar(content: Text("Credenciales incorrectas."), backgroundColor: Colors.red));
         }
       } catch (e) {
-        _showError("Ocurrió un error al verificar el profesor. $e");
+        messenger.showSnackBar(SnackBar(content: Text("Ocurrió un error al verificar el profesor. $e"), backgroundColor: Colors.red));
       }
     } else {
       // Lógica para estudiante
       try {
         final studentExists = await _studentsRepository.studentExists(id);
         if (studentExists) {
-          Navigator.pushReplacement(
-            context,
+          Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => HomeScreen(studentId: id.trim()),
             ),
           );
         } else {
-          _showError("Cédula de estudiante no encontrada.");
+          messenger.showSnackBar(const SnackBar(content: Text("Cédula de estudiante no encontrada."), backgroundColor: Colors.red));
         }
       } catch (e) {
-        _showError("Ocurrió un error al verificar el estudiante. $e");
+        messenger.showSnackBar(SnackBar(content: Text("Ocurrió un error al verificar el estudiante. $e"), backgroundColor: Colors.red));
       }
     }
 
@@ -92,12 +92,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = false;
       });
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
   }
 
   //

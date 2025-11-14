@@ -67,8 +67,13 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
               child: const Text('Guardar'),
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
+                  // Guardamos el navigator antes del await
+                  final navigator = Navigator.of(context);
                   await _subjectRepository.updateSubject(subjectId: subject.id, name: nameController.text, info: infoController.text);
-                  if (mounted) Navigator.of(context).pop();
+                  // No necesitamos 'mounted' check aquí porque el contexto del diálogo
+                  // es el que importa, y si el usuario no lo ha cerrado, es válido.
+                  // Usamos el navigator que guardamos.
+                  navigator.pop();
                 }
               },
             ),
@@ -174,23 +179,21 @@ class _HomeProfessorScreenState extends State<HomeProfesorScreen> {
                             }
                           },
                           onDismissed: (direction) async {
+                            // Guardamos el ScaffoldMessenger antes del await
+                            final messenger = ScaffoldMessenger.of(context);
                             try {
                               await _subjectRepository.deleteSubject(subject.id);
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          'Asignatura "${subject.name}" eliminada.')),
-                                );
-                              }
+                              messenger.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        'Asignatura "${subject.name}" eliminada.')),
+                              );
                             } catch (e) {
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          "Error al eliminar la asignatura: $e")),
-                                );
-                              }
+                              messenger.showSnackBar(
+                                SnackBar(
+                                    content: Text(
+                                        "Error al eliminar la asignatura: $e")),
+                              );
                             }
                           },
                           child: SurveyCard(
