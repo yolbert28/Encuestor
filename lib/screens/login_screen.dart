@@ -7,6 +7,7 @@ import 'package:encuestor/data/students_repository.dart';
 import 'package:encuestor/screens/home_professor_screen.dart';
 import 'package:encuestor/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -94,6 +95,15 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // Función para lanzar la URL de GitHub
+  Future<void> _launchURL() async {
+    final Uri url = Uri.parse('https://github.com/Yolbert28');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      // Opcional: Mostrar un error si no se puede abrir la URL
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("No se pudo abrir el enlace.")));
+    }
+  }
+
   //
 
   @override
@@ -107,6 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Spacer(),
             Image.asset("assets/images/logo.png", width: 200),
             SizedBox(height: 8),
             AnimatedSwitch(
@@ -146,6 +157,29 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: CircularProgressIndicator(color: Colors.white),
                   )
                 : PrimaryButton(text: "Ingresar", onPressed: _login),
+            
+            Spacer(),
+            InkWell(
+              onTap: _launchURL,
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Created by Yolbert28 ",
+                      style: TextStyle(color: Colors.white.withOpacity(0.8), fontWeight: FontWeight.bold), 
+                    ),
+                    Image.asset(
+                      'assets/images/logo_github.png', // Asegúrate de que este archivo exista
+                      width: 20,
+                      height: 20,
+                      color: Colors.white.withOpacity(0.8),
+                    ),
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),

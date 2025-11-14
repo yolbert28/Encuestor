@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:encuestor/core/text_style.dart';
 import 'package:flutter/material.dart';
 

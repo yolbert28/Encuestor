@@ -1,7 +1,6 @@
 import 'package:encuestor/components/primary_button.dart';
 import 'package:encuestor/components/secondary_button.dart';
 import 'package:encuestor/components/survey_add_text_field.dart';
-import 'package:encuestor/components/survey_text_field.dart';
 import 'package:encuestor/core/app_color.dart';
 import 'package:encuestor/core/text_style.dart';
 import 'package:flutter/material.dart';

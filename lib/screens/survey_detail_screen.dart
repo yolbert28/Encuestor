@@ -107,7 +107,6 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
     });
 
     try {
-      final messenger = ScaffoldMessenger.of(context);
       // 1. Obtener datos necesarios
       final Professor? professor = await _professorRepository.getProfessor(widget.subject.professorId);
       final List<Answer> answers = await _answersRepository.getAnswersForSubject(widget.subject.id);
